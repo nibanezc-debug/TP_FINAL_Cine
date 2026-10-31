@@ -5,6 +5,7 @@ from mysql.connector import Error as MySQLError
 
 from cine_src.errors import ApiError
 from cine_src.routes.servicios import servicios_bp
+from cine_src.routes.consumos import consumos_bp
 
 
 def crear_app():
@@ -13,6 +14,7 @@ def crear_app():
     if not app.secret_key:
         raise RuntimeError('Es necesario configurar FLASK_SECRET_KEY')
     app.register_blueprint(servicios_bp, url_prefix='/api')
+    app.register_blueprint(consumos_bp, url_prefix='/api')
 
     @app.errorhandler(ApiError)
     def manejar_error(error):
