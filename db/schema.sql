@@ -1,4 +1,5 @@
 CREATE DATABASE IF NOT EXISTS cine_paradiso;
+<<<<<<< Updated upstream
 
 CREATE TABLE  locales (
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -23,6 +24,8 @@ CREATE TABLE butacas (
 	FOREIGN KEY (id_sala) REFERENCES salas(id)
 );
 
+=======
+>>>>>>> Stashed changes
 CREATE TABLE usuarios (
 	id_usuarios INT AUTO_INCREMENT PRIMARY KEY,
 	nombre VARCHAR(100) NOT NULL,
