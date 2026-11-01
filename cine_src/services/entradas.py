@@ -1,7 +1,9 @@
 import io
+from cine_src import correo
 from cine_src.errors import ApiError
 from cine_src.repositories import entradas as repositorio
-from cine_src.validators.entradas import validar_compra, validar_filtros, validar_estado, validar_id, validar_validacion
+from cine_src.validators.entradas import (validar_agrupacion, validar_compra, validar_estado, validar_filtros,
+                                          validar_id, validar_periodo, validar_validacion)
 
 MINUTOS_LIMITE_CANCELACION = 120
 
@@ -18,6 +20,18 @@ def _obtener_autorizado(id_entrada: int, usuario: dict) -> dict:
         raise ApiError('La entrada no existe', 404)
     if entrada['id_usuario'] != usuario['id'] and usuario['rol'] != 'administrador':
         raise ApiError('No podés acceder a esta entrada', 403)
+    return entrada
+
+def _png_qr(codigo: str) -> bytes:
+    import qrcode
+    buffer = io.BytesIO()
+    qrcode.make(codigo).save(buffer, format='PNG')
+    return buffer.getvalue()
+
+def _obtener_activa(id_entrada: int, usuario: dict) -> dict:
+    entrada = _obtener_autorizado(id_entrada, usuario)
+    if entrada['estado'] != 'activa':
+        raise ApiError('La entrada ya no está activa', 409)
     return entrada
 
 def comprar(usuario: dict, datos):
@@ -40,13 +54,24 @@ def obtener(id_entrada: int, usuario: dict):
     return _detalle(_obtener_autorizado(id_entrada, usuario))
 
 def generar_qr(id_entrada: int, usuario: dict) -> bytes:
-    import qrcode
+    return _png_qr(_obtener_activa(id_entrada, usuario)['codigo_qr'])
+
+def factura(id_entrada: int, usuario: dict):
     entrada = _obtener_autorizado(id_entrada, usuario)
-    if entrada['estado'] != 'activa':
-        raise ApiError('La entrada ya no está activa', 409)
-    buffer = io.BytesIO()
-    qrcode.make(entrada['codigo_qr']).save(buffer, format='PNG')
-    return buffer.getvalue()
+    datos = repositorio.obtener_factura(entrada['id_reserva'])
+    if datos is None:
+        raise ApiError('La reserva de la entrada no existe', 404)
+    total_entradas = sum(e['precio'] for e in datos['entradas'] if e['estado'] != 'cancelada')
+    total_servicios = sum(s['subtotal'] for s in datos['servicios'])
+    return {**datos, 'total_entradas': total_entradas, 'total_servicios': total_servicios, 'total': total_entradas + total_servicios}
+
+def reenviar(id_entrada: int, usuario: dict):
+    entrada = _obtener_activa(id_entrada, usuario)
+    destinatario = repositorio.obtener_usuario(entrada['id_usuario'])
+    if destinatario is None:
+        raise ApiError('El usuario de la entrada no existe', 404)
+    correo.enviar_entrada(destinatario, entrada, _png_qr(entrada['codigo_qr']))
+    return {'enviado': True, 'destinatario': destinatario['email']}
 
 def cancelar(id_entrada: int, usuario: dict):
     entrada = _obtener_autorizado(id_entrada, usuario)
@@ -74,3 +99,11 @@ def validar(datos):
     if not repositorio.marcar_usada(entrada['id']):
         raise ApiError('La entrada ya fue utilizada', 409)
     return {'valida': True, 'id': entrada['id'], 'id_butaca': entrada['id_butaca'], 'estado': 'usada'}
+
+def estadisticas_cancelaciones(argumentos):
+    filas = repositorio.cancelaciones(validar_agrupacion(argumentos), validar_periodo(argumentos))
+    return [{**fila, 'porcentaje': round(fila['cancelaciones'] * 100 / fila['entradas'], 1)} for fila in filas]
+
+def estadisticas_franjas(argumentos):
+    filas = repositorio.franjas_horarias(validar_periodo(argumentos))
+    return [{**fila, 'franja': f"{fila['hora']:02d}:00-{fila['hora']:02d}:59"} for fila in filas]
