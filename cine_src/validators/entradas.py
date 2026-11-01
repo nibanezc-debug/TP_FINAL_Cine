@@ -1,3 +1,4 @@
+from datetime import datetime
 from cine_src.errors import ApiError
 
 ESTADOS = ('activa', 'usada', 'cancelada')
@@ -46,3 +47,27 @@ def validar_filtros(argumentos) -> dict:
     if estado is not None:
         filtros['estado'] = validar_estado(estado)
     return filtros
+
+AGRUPACIONES = ('funcion', 'pelicula')
+
+def validar_agrupacion(argumentos) -> str:
+    agrupar = argumentos.get('agrupar', 'funcion')
+    if agrupar not in AGRUPACIONES:
+        raise ApiError('El parámetro agrupar debe ser funcion o pelicula', 400)
+    return agrupar
+
+def _validar_fecha(valor: str, nombre: str) -> str:
+    try:
+        return datetime.strptime(valor, '%Y-%m-%d').date().isoformat()
+    except ValueError:
+        raise ApiError(f'El parámetro {nombre} debe tener formato AAAA-MM-DD', 400)
+
+def validar_periodo(argumentos) -> dict:
+    periodo = {}
+    for clave in ('desde', 'hasta'):
+        valor = argumentos.get(clave)
+        if valor:
+            periodo[clave] = _validar_fecha(valor, clave)
+    if 'desde' in periodo and 'hasta' in periodo and periodo['desde'] > periodo['hasta']:
+        raise ApiError('La fecha desde no puede ser posterior a la fecha hasta', 400)
+    return periodo
