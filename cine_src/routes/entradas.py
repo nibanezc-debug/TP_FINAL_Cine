@@ -33,3 +33,21 @@ def cancelar_entrada(id_entrada):
 @requiere_admin
 def validar_entrada():
     return (jsonify(servicio.validar(request.get_json(silent=True))), 200)
+
+@entradas_bp.get('/entradas/<int:id_entrada>/factura')
+def obtener_factura(id_entrada):
+    return (jsonify(servicio.factura(id_entrada, usuario_actual())), 200)
+
+@entradas_bp.post('/entradas/<int:id_entrada>/reenviar')
+def reenviar_entrada(id_entrada):
+    return (jsonify(servicio.reenviar(id_entrada, usuario_actual())), 200)
+
+@entradas_bp.get('/entradas/estadisticas/cancelaciones')
+@requiere_admin
+def estadisticas_cancelaciones():
+    return (jsonify(servicio.estadisticas_cancelaciones(request.args)), 200)
+
+@entradas_bp.get('/entradas/estadisticas/franjas-horarias')
+@requiere_admin
+def estadisticas_franjas_horarias():
+    return (jsonify(servicio.estadisticas_franjas(request.args)), 200)
