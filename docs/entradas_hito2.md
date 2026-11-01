@@ -1,4 +1,4 @@
-# Entradas — endpoints implementados
+# Entradas — endpoints implementados — (Santiago)
 
 | HTTP | Ruta | Permiso | Comportamiento |
 |---|---|---|---|
