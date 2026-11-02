@@ -25,7 +25,7 @@ def post_locales():
 
 
 @locales_bp.route('/locales/<int:id_local>', methods=['PATCH'])
-@requiere_Admin
+@requiere_admin
 def patch_locales(id_local):
     if repositories.buscar_local_por_id(id_local) is None:
         return jsonify({'error': 'no existe este local'}), 404
