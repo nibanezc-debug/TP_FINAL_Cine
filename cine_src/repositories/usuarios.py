@@ -48,3 +48,13 @@ def listar_todos():
                 return cursor.fetchone()
             finally:
                 cursor.close()
+                
+def actualizar_usuario(id_usuario: int, nombre: str, email: str):
+    with obtener_conexion() as conexion:
+        cursor = conexion.cursor(dictionary=True)
+        try:
+            query = "UPDATE usuarios SET nombre = %s, email = %s WHERE id = %s"
+            cursor.execute(query, (nombre, email, id_usuario))
+            conexion.commit()
+        finally:
+            cursor.close()
