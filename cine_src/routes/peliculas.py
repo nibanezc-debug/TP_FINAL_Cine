@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
 from cine_src.validators import peliculas as peliculas_validator
 from cine_src.services import peliculas as peliculas_service
-from cine_src.errors import ApiError
-from cine_src.security import requiere_admin, requiere_usuario
+from cine_src.security import requiere_admin, requiere_usuario, usuario_actual
 
 peliculas_bp = Blueprint("peliculas", __name__)
 
@@ -17,16 +16,16 @@ def get_externas():
 @requiere_usuario
 def get_peliculas():
     filtros = peliculas_validator.validar_filtros_peliculas(request.args)
-    peliculas = peliculas_service.listar_peliculas(filtros)
+    usuario = usuario_actual()
+    peliculas = peliculas_service.listar_peliculas(filtros, usuario['rol'])
     return jsonify({"peliculas": peliculas}), 200
 
 @peliculas_bp.route("/peliculas/<int:id>", methods=["GET"])
 @requiere_usuario
 def get_pelicula(id):
     peliculas_validator.validar_id(id)
-    pelicula = peliculas_service.obtener_pelicula_por_id(id)
-    if pelicula is None:
-        raise ApiError(f"No se encontró la película con ID {id}", 404)
+    usuario = usuario_actual()
+    pelicula = peliculas_service.obtener_pelicula_por_id(id, usuario['rol'])
     return jsonify(pelicula), 200
 
 @peliculas_bp.route("/peliculas", methods=["POST"])
@@ -34,7 +33,6 @@ def get_pelicula(id):
 def create_pelicula():
     datos_recibidos = request.get_json(silent=True)
     datos_limpios = peliculas_validator.validar_pelicula(datos_recibidos)
-
     resultado = peliculas_service.crear_pelicula(datos_limpios)
     return jsonify({"id_pelicula": resultado["id"]}), 201
 
@@ -44,11 +42,6 @@ def update_pelicula(id):
     peliculas_validator.validar_id(id)
     datos_recibidos = request.get_json(silent=True)
     datos_limpios = peliculas_validator.validar_pelicula(datos_recibidos)
-
-    existe = peliculas_service.obtener_pelicula_por_id(id)
-    if existe is None:
-        raise ApiError(f"No se encontró la película con ID {id}", 404)
-
     peliculas_service.actualizar_pelicula(id, datos_limpios)
     return "", 204
 
@@ -56,9 +49,5 @@ def update_pelicula(id):
 @requiere_admin
 def delete_pelicula(id):
     peliculas_validator.validar_id(id)
-    existe = peliculas_service.obtener_pelicula_por_id(id)
-    if existe is None:
-        raise ApiError(f"No se encontró la película con ID {id}", 404)
-
     peliculas_service.eliminar_pelicula(id)
     return "", 204

@@ -2,14 +2,15 @@ from datetime import datetime
 from cine_src import db
 
 def _formatear_fila(fila: dict | None) -> dict | None:
-    if fila is None:
-        return None
-    for campo in ("disponible_desde", "disponible_hasta"):
-        if isinstance(fila.get(campo), datetime):
-            fila[campo] = fila[campo].strftime("%Y-%m-%d %H:%M:%S")
-    if "activa" in fila and fila["activa"] is not None:
-        fila["activa"] = bool(fila["activa"])
-    return fila
+    resultado = None
+    if fila is not None:
+        for campo in ("disponible_desde", "disponible_hasta"):
+            if isinstance(fila.get(campo), datetime):
+                fila[campo] = fila[campo].strftime("%Y-%m-%d %H:%M:%S")
+        if "activa" in fila and fila["activa"] is not None:
+            fila["activa"] = bool(fila["activa"])
+        resultado = fila
+    return resultado
 
 def listar_peliculas(filtros: dict) -> list:
     sql = "SELECT * FROM peliculas WHERE 1=1"
@@ -31,12 +32,14 @@ def listar_peliculas(filtros: dict) -> list:
 
     sql += " ORDER BY id_pelicula DESC"
     filas = db.consultar_todos(sql, tuple(parametros))
-    return [_formatear_fila(f) for f in filas]
+    resultado = [_formatear_fila(f) for f in filas]
+    return resultado
 
 def obtener_pelicula_por_id(id_pelicula: int):
     sql = "SELECT * FROM peliculas WHERE id_pelicula = %s"
     fila = db.consultar_uno(sql, (id_pelicula,))
-    return _formatear_fila(fila)
+    resultado = _formatear_fila(fila)
+    return resultado
 
 def crear_pelicula(datos: dict) -> int:
     sql = """

@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS cine_paradiso;
+USE cine_paradiso;
 
-CREATE TABLE peliculas (
+CREATE TABLE IF NOT EXISTS peliculas (
     id_pelicula INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(150) NOT NULL,
     sinopsis TEXT,
