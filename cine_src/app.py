@@ -11,6 +11,7 @@ from cine_src.routes.salas import salas_bp
 from cine_src.routes.butacas import butacas_bp
 from cine_src.routes.peliculas import peliculas_bp
 from cine_src.routes.usuarios import usuarios_bp
+from cine_src.routes.funciones import funciones_bp
 
 def crear_app():
     app = Flask(__name__)
@@ -24,6 +25,7 @@ def crear_app():
     app.register_blueprint(butacas_bp, url_prefix='/api')
     app.register_blueprint(peliculas_bp, url_prefix='/api')
     app.register_blueprint(usuarios_bp, url_prefix='/api')
+    app.register_blueprint(funciones_bp, url_prefix="/api")
 
     @app.errorhandler(ApiError)
     def manejar_error(error):
