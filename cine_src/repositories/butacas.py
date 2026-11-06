@@ -1,4 +1,4 @@
-from cine_src.db import obtener_conexion as conexion
+from db import obtener_conexion as conexion
 
 def buscar_funcion_por_id(id_funcion):
     cursor = conexion.cursor(dictionary=True)

@@ -2,9 +2,9 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 
-from cine_src.errors import ApiError
-from cine_src.services import funciones as servicio
-from cine_src.validators.funciones import validar_datos_funcion
+from errors import ApiError
+from services import funciones as servicio
+from validators.funciones import validar_datos_funcion
 
 
 DATOS = {

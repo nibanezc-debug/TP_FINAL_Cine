@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from cine_src.errors import ApiError
+from errors import ApiError
 
 
 def validar_id(valor, nombre: str = "id") -> int:

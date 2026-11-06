@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
-from cine_src.security import requiere_admin, requiere_usuario
-from cine_src.services import funciones as servicio
+from security import requiere_admin, requiere_usuario
+from services import funciones as servicio
 
 funciones_bp = Blueprint("funciones", __name__)
 

@@ -1,8 +1,8 @@
 from functools import wraps
 from flask import request, session
 from werkzeug.security import check_password_hash
-from cine_src.db import consultar_uno
-from cine_src.errors import ApiError
+from db import consultar_uno
+from errors import ApiError
 
 def usuario_actual() -> dict:
     id_usuario = session.get('id_usuario')

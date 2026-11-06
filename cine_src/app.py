@@ -3,15 +3,15 @@ import os
 from flask import Flask, jsonify
 from mysql.connector import Error as MySQLError
 
-from cine_src.errors import ApiError
-from cine_src.routes.servicios import servicios_bp
-from cine_src.routes.consumos import consumos_bp
-from cine_src.routes.locales import locales_bp
-from cine_src.routes.salas import salas_bp
-from cine_src.routes.butacas import butacas_bp
-from cine_src.routes.peliculas import peliculas_bp
-from cine_src.routes.usuarios import usuarios_bp
-from cine_src.routes.funciones import funciones_bp
+from errors import ApiError
+from routes.servicios import servicios_bp
+from routes.consumos import consumos_bp
+from routes.locales import locales_bp
+from routes.salas import salas_bp
+from routes.butacas import butacas_bp
+from routes.peliculas import peliculas_bp
+from routes.usuarios import usuarios_bp
+from routes.funciones import funciones_bp
 
 def crear_app():
     app = Flask(__name__)

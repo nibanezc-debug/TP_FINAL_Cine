@@ -1,4 +1,4 @@
-from cine_src.db import obtener_conexion as conexion
+from db import obtener_conexion as conexion
 
 def listar_locales():
     cursor = conexion.cursor(dictionary=True)

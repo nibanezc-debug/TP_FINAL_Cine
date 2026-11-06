@@ -1,5 +1,5 @@
 
-from cine_src.repositories import locales as repositories
+from repositories import locales as repositories
 
 REQUERIDOS_LOCAL = ['nombre', 'direccion']
 TIPOS_LOCAL = {

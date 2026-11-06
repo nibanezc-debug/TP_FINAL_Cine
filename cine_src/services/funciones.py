@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
-from cine_src.errors import ApiError
-from cine_src.repositories import funciones as repositorio
-from cine_src.validators.funciones import validar_datos_funcion, validar_filtros, validar_id
+from errors import ApiError
+from repositories import funciones as repositorio
+from validators.funciones import validar_datos_funcion, validar_filtros, validar_id
 
 
 def buscar_funcion_por_id(id_funcion):

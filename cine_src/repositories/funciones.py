@@ -1,7 +1,7 @@
 from mysql.connector import IntegrityError
 
-from cine_src.db import consultar_todos, consultar_uno, ejecutar
-from cine_src.errors import ApiError
+from db import consultar_todos, consultar_uno, ejecutar
+from errors import ApiError
 
 
 def buscar_funcion_por_id(id_funcion):

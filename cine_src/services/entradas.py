@@ -1,8 +1,8 @@
 import io
-from cine_src import correo
-from cine_src.errors import ApiError
-from cine_src.repositories import entradas as repositorio
-from cine_src.validators.entradas import (validar_agrupacion, validar_compra, validar_estado, validar_filtros,
+import correo
+from errors import ApiError
+from repositories import entradas as repositorio
+from validators.entradas import (validar_agrupacion, validar_compra, validar_estado, validar_filtros,
                                           validar_id, validar_periodo, validar_validacion)
 
 MINUTOS_LIMITE_CANCELACION = 120

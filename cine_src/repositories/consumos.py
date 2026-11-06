@@ -1,4 +1,4 @@
-from cine_src.db import obtener_conexion
+from db import obtener_conexion
 
 def obtener_reserva(identificador: int):
     with obtener_conexion() as conexion:
@@ -19,7 +19,7 @@ def listar(identificador: int):
             cursor.close()
 
 def agregar(id_reserva: int, id_usuario: int, id_servicio: int, cantidad: int):
-    from cine_src.errors import ApiError
+    from errors import ApiError
     with obtener_conexion() as conexion:
         cursor = conexion.cursor(dictionary=True)
         try:
@@ -51,7 +51,7 @@ def agregar(id_reserva: int, id_usuario: int, id_servicio: int, cantidad: int):
             cursor.close()
 
 def eliminar(id_reserva: int, id_usuario: int, id_consumo: int):
-    from cine_src.errors import ApiError
+    from errors import ApiError
     with obtener_conexion() as conexion:
         cursor = conexion.cursor(dictionary=True)
         try:

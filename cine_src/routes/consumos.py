@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from cine_src.security import usuario_actual
-from cine_src.services import consumos as servicio
+from security import usuario_actual
+from services import consumos as servicio
 consumos_bp = Blueprint('consumos', __name__)
 
 @consumos_bp.get('/reservas/<int:id_reserva>/consumos')

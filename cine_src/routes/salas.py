@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
-from cine_src.repositories import salas as repositories
-from cine_src.services import salas as services
-from cine_src.security import requiere_admin
+from repositories import salas as repositories
+from services import salas as services
+from security import requiere_admin
 
 salas_bp = Blueprint('salas_bp', __name__)
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
-from cine_src.validators import peliculas as peliculas_validator
-from cine_src.services import peliculas as peliculas_service
-from cine_src.security import requiere_admin, requiere_usuario, usuario_actual
+from validators import peliculas as peliculas_validator
+from services import peliculas as peliculas_service
+from security import requiere_admin, requiere_usuario, usuario_actual
 
 peliculas_bp = Blueprint("peliculas", __name__)
 

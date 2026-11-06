@@ -1,7 +1,7 @@
 from flask import session
-from cine_src.errors import ApiError
-from cine_src.repositories import usuarios as repositorio
-from cine_src.validators.usuarios import (
+from errors import ApiError
+from repositories import usuarios as repositorio
+from validators.usuarios import (
     validar_id,
     validar_registro,
     validar_login,

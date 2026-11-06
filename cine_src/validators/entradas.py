@@ -1,5 +1,5 @@
 from datetime import datetime
-from cine_src.errors import ApiError
+from errors import ApiError
 
 ESTADOS = ('activa', 'usada', 'cancelada')
 
