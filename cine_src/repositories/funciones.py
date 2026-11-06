@@ -1,4 +1,7 @@
-from cine_src.db import consultar_todos, consultar_uno
+from mysql.connector import IntegrityError
+
+from cine_src.db import consultar_todos, consultar_uno, ejecutar
+from cine_src.errors import ApiError
 
 
 def buscar_funcion_por_id(id_funcion):
@@ -75,3 +78,71 @@ def listar_cartelera(id_local=None, fecha=None):
         fecha=fecha,
         en_cartelera=True,
     )
+
+
+# Consultas de apoyo para las reglas de negocio del CRUD.
+def buscar_pelicula(id_pelicula):
+    sql = """SELECT id_pelicula, activa, duracion_minutos,
+                    disponible_desde, disponible_hasta
+             FROM peliculas WHERE id_pelicula = %s"""
+    return consultar_uno(sql, (id_pelicula,))
+
+
+def buscar_sala(id_sala):
+    return consultar_uno("SELECT id FROM salas WHERE id = %s", (id_sala,))
+
+
+def tiene_entradas(id_funcion):
+    # Incluye entradas canceladas para conservar el historial.
+    return consultar_uno("SELECT id FROM entradas WHERE id_funcion = %s LIMIT 1", (id_funcion,)) is not None
+
+
+def hay_superposicion(id_sala, inicio, fin, id_funcion=None):
+    # Se calcula el final de las funciones usando la duración de su película.
+    sql = """
+        SELECT f.id FROM funciones f
+        JOIN peliculas p ON p.id_pelicula = f.id_pelicula
+        WHERE f.id_sala = %s
+          AND f.fecha_hora < %s
+          AND DATE_ADD(
+              f.fecha_hora,
+              INTERVAL GREATEST(COALESCE(p.duracion_minutos, 0), 1) MINUTE
+          ) > %s
+    """
+    parametros = [id_sala, fin, inicio]
+    if id_funcion is not None:
+        sql += " AND f.id <> %s"
+        parametros.append(id_funcion)
+    return consultar_uno(sql + " LIMIT 1", tuple(parametros)) is not None
+
+
+def crear_funcion(datos):
+    sql = """INSERT INTO funciones (id_pelicula, id_sala, fecha_hora, precio)
+             VALUES (%s, %s, %s, %s)"""
+    parametros = (datos["id_pelicula"], datos["id_sala"], datos["fecha_hora"], datos["precio"])
+    try:
+        id_nuevo, _ = ejecutar(sql, parametros)
+    except IntegrityError as error:
+        if error.errno == 1062:
+            raise ApiError("Ya existe una función en esa sala y horario", 409) from error
+        raise
+    return id_nuevo
+
+
+def modificar_funcion(id_funcion, datos):
+    # Las columnas vienen del validador, no del usuario directamente.
+    cambios = [f"{campo} = %s" for campo in datos]
+    parametros = tuple(datos.values()) + (id_funcion,)
+    sql = f"UPDATE funciones SET {', '.join(cambios)} WHERE id = %s"
+    try:
+        _, filas = ejecutar(sql, parametros)
+    except IntegrityError as error:
+        if error.errno == 1062:
+            raise ApiError("Ya existe una función en esa sala y horario", 409) from error
+        raise
+    return filas > 0
+
+
+def eliminar_funcion(id_funcion):
+    _, filas = ejecutar("DELETE FROM funciones WHERE id = %s", (id_funcion,))
+    return filas > 0
