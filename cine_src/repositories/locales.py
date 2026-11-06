@@ -1,41 +1,36 @@
 from db import obtener_conexion as conexion
 
+
 def listar_locales():
-    cursor = conexion.cursor(dictionary=True)
     query = "SELECT * FROM locales"
-    cursor.execute(query)
-    locales = cursor.fetchall()
-    cursor.close()
-    return locales
+    
+    with conexion.cursor(dictionary=True) as cursor:
+        cursor.execute(query)
+        return cursor.fetchall()
 
 
 def agregar_local(data):
-    cursor = conexion.cursor(dictionary=True)
     nombre = data.get('nombre')
     direccion = data.get('direccion')
 
     query = "INSERT INTO locales (nombre, direccion) VALUES (%s, %s)"
     params = (nombre, direccion)
-    
-    cursor.execute(query, params)
-    conexion.commit()
-    cursor.close()
+
+    with conexion.cursor(dictionary=True) as cursor:
+        cursor.execute(query, params)
+        conexion.commit()
 
 
 def buscar_local_por_id(id_local):
-    cursor = conexion.cursor(dictionary=True)
     query = "SELECT * FROM locales WHERE id_local = %s"
     params = (id_local,)
-    
-    cursor.execute(query, params)
-    local = cursor.fetchone()
-    cursor.close()
-    return local
+
+    with conexion.cursor(dictionary=True) as cursor:
+        cursor.execute(query, params)
+        return cursor.fetchone()
 
 
 def actualizar_local(data, id_local):
-    cursor = conexion.cursor(dictionary=True)
-
     campos = []
     params = []
 
@@ -48,33 +43,30 @@ def actualizar_local(data, id_local):
         params.append(data['direccion'])
 
     if not campos:
-        cursor.close()
         return
 
     query = f"UPDATE locales SET {', '.join(campos)} WHERE id_local = %s"
     params.append(id_local)
 
-    cursor.execute(query, tuple(params))
-    conexion.commit()
-    cursor.close()
+    with conexion.cursor(dictionary=True) as cursor:
+        cursor.execute(query, params)
+        conexion.commit()
 
 
 def eliminar_local(id_local):
-    cursor = conexion.cursor(dictionary=True)
     query = "DELETE FROM locales WHERE id_local = %s"
     params = (id_local,)
-    
-    cursor.execute(query, params)
-    conexion.commit()
-    cursor.close()
+
+    with conexion.cursor(dictionary=True) as cursor:
+        cursor.execute(query, params)
+        conexion.commit()
 
 
 def contar_salas_de_local(id_local):
-    cursor = conexion.cursor(dictionary=True)
     query = "SELECT COUNT(*) AS total FROM salas WHERE id_local = %s"
     params = (id_local,)
-    
-    cursor.execute(query, params)
-    resultado = cursor.fetchone()
-    cursor.close()
-    return resultado['total'] if resultado else 0
+
+    with conexion.cursor(dictionary=True) as cursor:
+        cursor.execute(query, params)
+        resultado = cursor.fetchone()
+        return resultado['total'] if resultado else 0
