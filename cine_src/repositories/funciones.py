@@ -1,4 +1,4 @@
-from cine_src.db import consultar_todos, consultar_uno
+from db import consultar_todos, consultar_uno
 
 
 def buscar_funcion_por_id(id_funcion):

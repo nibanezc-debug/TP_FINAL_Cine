@@ -1,6 +1,6 @@
-from cine_src.errors import ApiError
-from cine_src.repositories import servicios as repositorio
-from cine_src.validators.servicios import validar_servicio, validar_id
+from errors import ApiError
+from repositories import servicios as repositorio
+from validators.servicios import validar_servicio, validar_id
 
 def listar():
     return repositorio.listar()

@@ -1,7 +1,7 @@
 import os
 import requests
-from cine_src.errors import ApiError
-from cine_src.repositories import peliculas as peliculas_repo
+from errors import ApiError
+from repositories import peliculas as peliculas_repo
 
 ERRORES_SIN_RESULTADOS = ("Movie not found!", "Too many results.")
 

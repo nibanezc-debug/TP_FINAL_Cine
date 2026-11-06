@@ -1,4 +1,4 @@
-from cine_src.repositories import salas as repositories
+from repositories import salas as repositories
 
 REQUERIDOS_SALA = ['nombre', 'capacidad', 'formato']
 TIPOS_SALA = {

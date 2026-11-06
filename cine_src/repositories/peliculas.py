@@ -1,5 +1,5 @@
 from datetime import datetime
-from cine_src import db
+import db
 
 def _formatear_fila(fila: dict | None) -> dict | None:
     resultado = None

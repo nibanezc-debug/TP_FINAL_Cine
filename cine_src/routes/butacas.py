@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from cine_src.repositories import butacas as repositories
+from repositories import butacas as repositories
 
 butacas_bp = Blueprint('butacas_bp', __name__)
 

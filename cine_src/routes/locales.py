@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
-from cine_src.repositories import locales as repositories
-from cine_src.services import locales as services
-from cine_src.security import requiere_admin
+from repositories import locales as repositories
+from services import locales as services
+from security import requiere_admin
 
 locales_bp = Blueprint('locales_bp', __name__)
 

@@ -1,4 +1,4 @@
-from cine_src.db import obtener_conexion as conexion
+from db import obtener_conexion as conexion
 
 def listar_salas_por_local(id_local, formato=None, capacidad=None, limit=10, offset=0):
     cursor = conexion.cursor(dictionary=True)

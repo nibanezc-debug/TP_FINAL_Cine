@@ -1,7 +1,7 @@
 import os
 import smtplib
 from email.message import EmailMessage
-from cine_src.errors import ApiError
+from errors import ApiError
 
 def _conectar(servidor: str, puerto: int):
     if puerto == 465:

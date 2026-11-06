@@ -1,5 +1,5 @@
-from cine_src.db import obtener_conexion
-from cine_src.errors import ApiError
+from db import obtener_conexion
+from errors import ApiError
 
 def crear_usuario(nombre: str, email: str, password: str, rol: str = 'cliente') -> int:
     with obtener_conexion() as conexion:

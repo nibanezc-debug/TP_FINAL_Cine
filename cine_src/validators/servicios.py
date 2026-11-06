@@ -1,4 +1,4 @@
-from cine_src.errors import ApiError
+from errors import ApiError
 
 def validar_id(numero: int) -> int:
     if type(numero) is not int or numero <= 0:

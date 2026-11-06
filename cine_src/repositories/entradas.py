@@ -1,8 +1,8 @@
 import secrets
 from datetime import datetime
 from mysql.connector import IntegrityError
-from cine_src.db import consultar_todos, consultar_uno, ejecutar, obtener_conexion
-from cine_src.errors import ApiError
+from db import consultar_todos, consultar_uno, ejecutar, obtener_conexion
+from errors import ApiError
 
 _SELECT_ENTRADA = (
     'SELECT e.id, e.id_reserva, r.id_usuario, e.id_funcion, f.fecha_hora AS fecha_hora_funcion, '
