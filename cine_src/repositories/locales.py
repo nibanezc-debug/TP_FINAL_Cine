@@ -1,33 +1,19 @@
-from db import obtener_conexion as conexion
+from db import consultar_todos, consultar_uno, ejecutar
 
 
 def listar_locales():
-    query = "SELECT * FROM locales"
-    
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query)
-        return cursor.fetchall()
-
-
-def agregar_local(data):
-    nombre = data.get('nombre')
-    direccion = data.get('direccion')
-
-    query = "INSERT INTO locales (nombre, direccion) VALUES (%s, %s)"
-    params = (nombre, direccion)
-
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, params)
-        conexion.commit()
+    return consultar_todos("SELECT * FROM locales")
 
 
 def buscar_local_por_id(id_local):
-    query = "SELECT * FROM locales WHERE id_local = %s"
-    params = (id_local,)
+    return consultar_uno("SELECT * FROM locales WHERE id = %s", (id_local,))
 
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, params)
-        return cursor.fetchone()
+
+def agregar_local(data):
+    sql = "INSERT INTO locales (nombre, direccion) VALUES (%s, %s)"
+    params = (data.get('nombre'), data.get('direccion'))
+    id_creado, _ = ejecutar(sql, params)
+    return id_creado
 
 
 def actualizar_local(data, id_local):
@@ -43,30 +29,19 @@ def actualizar_local(data, id_local):
         params.append(data['direccion'])
 
     if not campos:
-        return
+        return 0
 
-    query = f"UPDATE locales SET {', '.join(campos)} WHERE id_local = %s"
     params.append(id_local)
-
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, params)
-        conexion.commit()
+    sql = f"UPDATE locales SET {', '.join(campos)} WHERE id = %s"
+    _, filas_afectadas = ejecutar(sql, tuple(params))
+    return filas_afectadas
 
 
 def eliminar_local(id_local):
-    query = "DELETE FROM locales WHERE id_local = %s"
-    params = (id_local,)
-
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, params)
-        conexion.commit()
+    _, filas_afectadas = ejecutar("DELETE FROM locales WHERE id = %s", (id_local,))
+    return filas_afectadas
 
 
 def contar_salas_de_local(id_local):
-    query = "SELECT COUNT(*) AS total FROM salas WHERE id_local = %s"
-    params = (id_local,)
-
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, params)
-        resultado = cursor.fetchone()
-        return resultado['total'] if resultado else 0
+    resultado = consultar_uno("SELECT COUNT(*) AS total FROM salas WHERE id_local = %s", (id_local,))
+    return resultado['total'] if resultado else 0

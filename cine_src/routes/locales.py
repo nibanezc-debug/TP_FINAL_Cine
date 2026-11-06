@@ -7,9 +7,12 @@ locales_bp = Blueprint('locales_bp', __name__)
 
 @locales_bp.route('/locales', methods=['GET'])
 def get_locales():
-    locales = repositories.listar_locales()
-    return jsonify(locales or []), 200
-
+    try:
+        locales = repositories.listar_locales()
+        return jsonify(locales), 200
+    except Exception as e:
+        print("\n---> ERROR REAL DE MYSQL:", str(e), "\n")  # Imprime el detalle en la terminal
+        return jsonify({"error": str(e)}), 500
 
 @locales_bp.route('/locales', methods=['POST'])
 @requiere_admin

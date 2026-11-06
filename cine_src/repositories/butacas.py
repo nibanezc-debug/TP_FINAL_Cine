@@ -1,12 +1,9 @@
-from db import obtener_conexion as conexion
+from db import consultar_todos, consultar_uno
 
 
 def buscar_funcion_por_id(id_funcion):
     query = "SELECT * FROM funciones WHERE id = %s"
-
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, (id_funcion,))
-        return cursor.fetchone()
+    return consultar_uno(query, (id_funcion,))
 
 
 def listar_butacas_por_funcion(id_funcion):
@@ -22,7 +19,4 @@ def listar_butacas_por_funcion(id_funcion):
         WHERE funciones.id = %s
         ORDER BY butacas.fila, butacas.columna
     """
-
-    with conexion.cursor(dictionary=True) as cursor:
-        cursor.execute(query, (id_funcion,))
-        return cursor.fetchall()
+    return consultar_todos(query, (id_funcion,))

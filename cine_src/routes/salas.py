@@ -10,15 +10,12 @@ def get_salas_por_local(id_local):
     if repositories.buscar_local_por_id(id_local) is None:
         return jsonify({'error': 'Local no encontrado'}), 404
 
-    # Parámetros de filtro
     formato = request.args.get('formato')
     capacidad = request.args.get('capacidad', type=int)
 
-    # Parámetros de paginación con guión bajo
     limit = request.args.get('_limit', default=10, type=int)
     offset = request.args.get('_offset', default=0, type=int)
 
-    # El servicio devuelve la lista paginada y el conteo total de registros
     salas, total = services.listar_salas_por_local(
         id_local=id_local, 
         formato=formato, 
@@ -27,7 +24,6 @@ def get_salas_por_local(id_local):
         offset=offset
     )
 
-    # Construcción de query params para preservar filtros en los links HATEOAS
     extra_params = ""
     if formato:
         extra_params += f"&formato={formato}"
@@ -36,7 +32,6 @@ def get_salas_por_local(id_local):
 
     base_url = request.base_url
 
-    # Cálculo de los offsets para navegación HATEOAS
     prev_offset = offset - limit if offset - limit >= 0 else None
     next_offset = offset + limit if (offset + limit) < total else None
     last_offset = max(0, ((total - 1) // limit) * limit) if total > 0 else 0
