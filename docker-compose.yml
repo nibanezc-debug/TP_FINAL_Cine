@@ -5,7 +5,12 @@ services:
     ports:
       - '3306:3306'
     environment:
+<<<<<<< Updated upstream:docker-compose.yml
       MYSQL_DATABASE: Cine_Paradiso
       MYSQL_ROOT_PASSWORD: ibanez
+=======
+      MYSQL_DATABASE: cine_paradiso
+      MYSQL_ROOT_PASSWORD: lanzillotta
+>>>>>>> Stashed changes:docker/docker-compose.yml
     volumes:
       - ../sql/init.sql:/docker-entrypoint-initdb.d/init.sql
