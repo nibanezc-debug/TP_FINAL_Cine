@@ -2,10 +2,10 @@ CREATE DATABASE IF NOT EXISTS cine_paradiso;
 USE cine_paradiso;
 
 CREATE TABLE IF NOT EXISTS usuarios (
-    id_usuarios INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     rol ENUM('administrador', 'cliente') NOT NULL DEFAULT 'cliente',
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS reservas (
     id_usuario INT NOT NULL,
     fecha_reserva DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     estado ENUM('pendiente', 'pagada', 'cancelada') NOT NULL DEFAULT 'pendiente',
-    CONSTRAINT fk_reservas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuarios)
+    CONSTRAINT fk_reservas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS butacas (
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS butacas (
     id_sala INT NOT NULL,
     columna INT NOT NULL,
     fila CHAR(1) NOT NULL,
-    CONSTRAINT fk_butacas_sala FOREIGN KEY (id_sala) REFERENCES salas(id)
+    FOREIGN KEY (id_sala) REFERENCES salas(id)
 );
 
 CREATE TABLE IF NOT EXISTS funciones (

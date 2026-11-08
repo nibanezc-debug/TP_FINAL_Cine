@@ -10,44 +10,8 @@ def get_salas_por_local(id_local):
     if repositories.buscar_local_por_id(id_local) is None:
         return jsonify({'error': 'Local no encontrado'}), 404
 
-    formato = request.args.get('formato')
-    capacidad = request.args.get('capacidad', type=int)
-
-    limit = request.args.get('_limit', default=10, type=int)
-    offset = request.args.get('_offset', default=0, type=int)
-
-    salas, total = services.listar_salas_por_local(
-        id_local=id_local, 
-        formato=formato, 
-        capacidad=capacidad,
-        limit=limit,
-        offset=offset
-    )
-
-    extra_params = ""
-    if formato:
-        extra_params += f"&formato={formato}"
-    if capacidad is not None:
-        extra_params += f"&capacidad={capacidad}"
-
-    base_url = request.base_url
-
-    prev_offset = offset - limit if offset - limit >= 0 else None
-    next_offset = offset + limit if (offset + limit) < total else None
-    last_offset = max(0, ((total - 1) // limit) * limit) if total > 0 else 0
-
-    response = {
-        'items': salas or [],
-        '_limit': limit,
-        '_offset': offset,
-        '_total': total,
-        '_first': f"{base_url}?_limit={limit}&_offset=0{extra_params}",
-        '_prev': f"{base_url}?_limit={limit}&_offset={prev_offset}{extra_params}" if prev_offset is not None else None,
-        '_next': f"{base_url}?_limit={limit}&_offset={next_offset}{extra_params}" if next_offset is not None else None,
-        '_last': f"{base_url}?_limit={limit}&_offset={last_offset}{extra_params}"
-    }
-
-    return jsonify(response), 200
+    respuesta = services.obtener_salas_por_local_paginado(id_local, request.args)
+    return jsonify(respuesta), 200
 
 
 @salas_bp.route('/locales/<int:id_local>/salas', methods=['POST'])

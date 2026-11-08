@@ -11,7 +11,7 @@ def get_locales():
         locales = repositories.listar_locales()
         return jsonify(locales), 200
     except Exception as e:
-        print("\n---> ERROR REAL DE MYSQL:", str(e), "\n")  # Imprime el detalle en la terminal
+        print("\n---> ERROR REAL DE MYSQL:", str(e), "\n")
         return jsonify({"error": str(e)}), 500
 
 @locales_bp.route('/locales', methods=['POST'])

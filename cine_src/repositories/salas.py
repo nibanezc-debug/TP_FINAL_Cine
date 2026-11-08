@@ -1,4 +1,10 @@
-from db import consultar_todos, consultar_uno, ejecutar
+from db import consultar_todos, consultar_uno, ejecutar, ejecutar_muchos
+
+CAPACIDADES_PERMITIDAS = {
+    120: (10, 12),
+    250: (10, 25),
+    450: (15, 30),
+}
 
 
 def listar_salas_por_local(id_local, formato=None, capacidad=None, limit=10, offset=0):
@@ -13,7 +19,9 @@ def listar_salas_por_local(id_local, formato=None, capacidad=None, limit=10, off
         query += " AND capacidad >= %s"
         params.append(capacidad)
 
-    query += f" LIMIT {int(limit)} OFFSET {int(offset)}"
+    query += " LIMIT %s OFFSET %s"
+    params.extend([int(limit), int(offset)])
+
     return consultar_todos(query, tuple(params))
 
 
@@ -37,11 +45,37 @@ def buscar_local_por_id(id_local):
     return consultar_uno("SELECT * FROM locales WHERE id = %s", (id_local,))
 
 
+def obtener_dimensiones_sala(capacidad):
+    if capacidad not in CAPACIDADES_PERMITIDAS:
+        raise ValueError(
+            f"Capacidad '{capacidad}' no válida. Las capacidades permitidas son: 120, 250 o 450."
+        )
+    return CAPACIDADES_PERMITIDAS[capacidad]
+
+
 def agregar_sala(data, id_local):
-    sql = "INSERT INTO salas (nombre, capacidad, formato, id_local) VALUES (%s, %s, %s, %s)"
-    params = (data.get('nombre'), data.get('capacidad'), data.get('formato'), id_local)
-    id_creado, _ = ejecutar(sql, params)
-    return id_creado
+    capacidad = int(data.get('capacidad'))
+    cant_filas, cant_cols = obtener_dimensiones_sala(capacidad)
+
+    query_sala = "INSERT INTO salas (nombre, capacidad, formato, id_local) VALUES (%s, %s, %s, %s)"
+    params_sala = (data.get('nombre'), capacidad, data.get('formato'), id_local)
+    id_sala_creada, _ = ejecutar(query_sala, params_sala)
+
+    butacas_params = []
+    butacas_creadas = 0
+
+    for f in range(cant_filas):
+        letra_fila = chr(65 + f)
+        for c in range(1, cant_cols + 1):
+            if butacas_creadas < capacidad:
+                butacas_params.append((id_sala_creada, c, letra_fila))
+                butacas_creadas += 1
+
+    if butacas_params:
+        query_butacas = "INSERT INTO butacas (id_sala, columna, fila) VALUES (%s, %s, %s)"
+        ejecutar_muchos(query_butacas, butacas_params)
+
+    return id_sala_creada
 
 
 def actualizar_sala(data, id_sala):
@@ -74,6 +108,9 @@ def buscar_sala_por_id(id_sala):
 
 
 def eliminar_sala(id_sala):
+
+    ejecutar("DELETE FROM butacas WHERE id_sala = %s", (id_sala,))
+
     _, filas_afectadas = ejecutar("DELETE FROM salas WHERE id = %s", (id_sala,))
     return filas_afectadas
 

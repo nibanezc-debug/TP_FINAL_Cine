@@ -7,15 +7,15 @@ from errors import ApiError
 def usuario_actual() -> dict:
     id_usuario = session.get('id_usuario')
     if type(id_usuario) is int and id_usuario > 0:
-        usuario = consultar_uno('SELECT id_usuarios AS id, rol FROM usuarios WHERE id_usuarios = %s', (id_usuario,))
+        usuario = consultar_uno('SELECT id, rol FROM usuarios WHERE id = %s', (id_usuario,))
         if usuario:
             return usuario
     credenciales = request.authorization
     if credenciales and (credenciales.type or '').lower() == 'basic':
         if not request.is_secure and request.remote_addr not in ('127.0.0.1', '::1'):
             raise ApiError('HTTP Basic solo está permitido con HTTPS o en localhost', 403)
-        usuario = consultar_uno('SELECT id_usuarios AS id, rol, password_hash FROM usuarios WHERE email = %s', (credenciales.username,))
-        if usuario and check_password_hash(usuario['password_hash'], credenciales.password or ''):
+        usuario = consultar_uno('SELECT id, rol, password FROM usuarios WHERE email = %s', (credenciales.username,))
+        if usuario and check_password_hash(usuario['password'], credenciales.password or ''):
             return {'id': usuario['id'], 'rol': usuario['rol']}
     raise ApiError('Debés iniciar sesión para utilizar este endpoint', 401)
 

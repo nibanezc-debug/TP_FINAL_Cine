@@ -10,7 +10,7 @@ def buscar_local_por_id(id_local):
 
 
 def agregar_local(data):
-    sql = "INSERT INTO locales (nombre, direccion) VALUES (%s, %s)"
+    sql ="INSERT INTO locales (nombre, direccion) VALUES (%s, %s)"
     params = (data.get('nombre'), data.get('direccion'))
     id_creado, _ = ejecutar(sql, params)
     return id_creado
