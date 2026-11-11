@@ -41,3 +41,17 @@ def ejecutar(sql: str, parametros: tuple=()) -> tuple[int, int]:
             raise
         finally:
             cursor.close()
+
+def ejecutar_muchos(sql: str, parametros: list[tuple] = []) -> int:
+    with obtener_conexion() as conexion:
+        cursor = conexion.cursor()
+        try:
+            cursor.executemany(sql, parametros)
+            filas_afectadas = cursor.rowcount
+            conexion.commit()
+            return filas_afectadas
+        except Exception:
+            conexion.rollback()
+            raise
+        finally:
+            cursor.close()

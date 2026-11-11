@@ -1,17 +1,12 @@
-from cine_src.db import obtener_conexion as conexion
+from db import consultar_todos, consultar_uno
+
 
 def buscar_funcion_por_id(id_funcion):
-    cursor = conexion.cursor(dictionary=True)
     query = "SELECT * FROM funciones WHERE id = %s"
-    cursor.execute(query, (id_funcion,))
-    funcion = cursor.fetchone()
-    cursor.close()
-    return funcion
+    return consultar_uno(query, (id_funcion,))
 
 
 def listar_butacas_por_funcion(id_funcion):
-    cursor = conexion.cursor(dictionary=True)
-
     query = """
         SELECT 
             butacas.id,
@@ -24,9 +19,4 @@ def listar_butacas_por_funcion(id_funcion):
         WHERE funciones.id = %s
         ORDER BY butacas.fila, butacas.columna
     """
-
-    cursor.execute(query, (id_funcion,))
-    butacas = cursor.fetchall()
-    cursor.close()
-
-    return butacas
+    return consultar_todos(query, (id_funcion,))

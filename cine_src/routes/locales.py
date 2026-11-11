@@ -1,15 +1,18 @@
 from flask import Blueprint, jsonify, request
-from cine_src.repositories import locales as repositories
-from cine_src.services import locales as services
-from cine_src.security import requiere_admin
+from repositories import locales as repositories
+from services import locales as services
+from security import requiere_admin
 
 locales_bp = Blueprint('locales_bp', __name__)
 
 @locales_bp.route('/locales', methods=['GET'])
 def get_locales():
-    locales = repositories.listar_locales()
-    return jsonify(locales or []), 200
-
+    try:
+        locales = repositories.listar_locales()
+        return jsonify(locales), 200
+    except Exception as e:
+        print("\n---> ERROR REAL DE MYSQL:", str(e), "\n")
+        return jsonify({"error": str(e)}), 500
 
 @locales_bp.route('/locales', methods=['POST'])
 @requiere_admin
@@ -25,7 +28,7 @@ def post_locales():
 
 
 @locales_bp.route('/locales/<int:id_local>', methods=['PATCH'])
-@requiere_Admin
+@requiere_admin
 def patch_locales(id_local):
     if repositories.buscar_local_por_id(id_local) is None:
         return jsonify({'error': 'no existe este local'}), 404

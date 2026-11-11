@@ -1,8 +1,13 @@
-from cine_src.db import obtener_conexion as conexion
+from db import consultar_todos, consultar_uno, ejecutar, ejecutar_muchos
+
+CAPACIDADES_PERMITIDAS = {
+    120: (10, 12),
+    250: (10, 25),
+    450: (15, 30),
+}
+
 
 def listar_salas_por_local(id_local, formato=None, capacidad=None, limit=10, offset=0):
-    cursor = conexion.cursor(dictionary=True)
-
     query = "SELECT * FROM salas WHERE id_local = %s"
     params = [id_local]
 
@@ -15,15 +20,12 @@ def listar_salas_por_local(id_local, formato=None, capacidad=None, limit=10, off
         params.append(capacidad)
 
     query += " LIMIT %s OFFSET %s"
-    params.extend([limit, offset])
+    params.extend([int(limit), int(offset)])
 
-    cursor.execute(query, params)
-    return cursor.fetchall()
+    return consultar_todos(query, tuple(params))
 
 
 def contar_total_salas(id_local, formato=None, capacidad=None):
-    cursor = conexion.cursor(dictionary=True)
-
     query = "SELECT COUNT(*) AS total FROM salas WHERE id_local = %s"
     params = [id_local]
 
@@ -35,36 +37,48 @@ def contar_total_salas(id_local, formato=None, capacidad=None):
         query += " AND capacidad >= %s"
         params.append(capacidad)
 
-    cursor.execute(query, params)
-    resultado = cursor.fetchone()
+    resultado = consultar_uno(query, tuple(params))
     return resultado['total'] if resultado else 0
 
 
 def buscar_local_por_id(id_local):
-    cursor = conexion.cursor(dictionary=True)
+    return consultar_uno("SELECT * FROM locales WHERE id = %s", (id_local,))
 
-    query = "SELECT * FROM locales WHERE id_local = %s"
-    params = (id_local,)
-    cursor.execute(query, params)
-    return cursor.fetchone()
+
+def obtener_dimensiones_sala(capacidad):
+    if capacidad not in CAPACIDADES_PERMITIDAS:
+        raise ValueError(
+            f"Capacidad '{capacidad}' no válida. Las capacidades permitidas son: 120, 250 o 450."
+        )
+    return CAPACIDADES_PERMITIDAS[capacidad]
 
 
 def agregar_sala(data, id_local):
-    cursor = conexion.cursor(dictionary=True)
+    capacidad = int(data.get('capacidad'))
+    cant_filas, cant_cols = obtener_dimensiones_sala(capacidad)
 
-    nombre = data.get('nombre')
-    capacidad = data.get('capacidad')
-    formato = data.get('formato')
+    query_sala = "INSERT INTO salas (nombre, capacidad, formato, id_local) VALUES (%s, %s, %s, %s)"
+    params_sala = (data.get('nombre'), capacidad, data.get('formato'), id_local)
+    id_sala_creada, _ = ejecutar(query_sala, params_sala)
 
-    query = "INSERT INTO salas (nombre, capacidad, formato, id_local) VALUES (%s, %s, %s, %s)"
-    params = (nombre, capacidad, formato, id_local)
-    cursor.execute(query, params)
-    conexion.commit()
+    butacas_params = []
+    butacas_creadas = 0
+
+    for f in range(cant_filas):
+        letra_fila = chr(65 + f)
+        for c in range(1, cant_cols + 1):
+            if butacas_creadas < capacidad:
+                butacas_params.append((id_sala_creada, c, letra_fila))
+                butacas_creadas += 1
+
+    if butacas_params:
+        query_butacas = "INSERT INTO butacas (id_sala, columna, fila) VALUES (%s, %s, %s)"
+        ejecutar_muchos(query_butacas, butacas_params)
+
+    return id_sala_creada
 
 
 def actualizar_sala(data, id_sala):
-    cursor = conexion.cursor(dictionary=True)
-
     campos = []
     params = []
 
@@ -81,37 +95,25 @@ def actualizar_sala(data, id_sala):
         params.append(data['formato'])
 
     if not campos:
-        return
+        return 0
 
-    query = f"UPDATE salas SET {', '.join(campos)} WHERE id_sala = %s"
     params.append(id_sala)
-
-    cursor.execute(query, params)
-    conexion.commit()
+    sql = f"UPDATE salas SET {', '.join(campos)} WHERE id = %s"
+    _, filas_afectadas = ejecutar(sql, tuple(params))
+    return filas_afectadas
 
 
 def buscar_sala_por_id(id_sala):
-    cursor = conexion.cursor(dictionary=True)
-
-    query = "SELECT * FROM salas WHERE id_sala = %s"
-    params = (id_sala,)
-    cursor.execute(query, params)
-    return cursor.fetchone()
+    return consultar_uno("SELECT * FROM salas WHERE id = %s", (id_sala,))
 
 
 def eliminar_sala(id_sala):
-    cursor = conexion.cursor(dictionary=True)
 
-    query = "DELETE FROM salas WHERE id_sala = %s"
-    params = (id_sala,)
-    cursor.execute(query, params)
-    conexion.commit()
+    ejecutar("DELETE FROM butacas WHERE id_sala = %s", (id_sala,))
+
+    _, filas_afectadas = ejecutar("DELETE FROM salas WHERE id = %s", (id_sala,))
+    return filas_afectadas
 
 
 def buscar_sala_en_funciones(id_sala):
-    cursor = conexion.cursor(dictionary=True)
-
-    query = "SELECT * FROM funciones WHERE id_sala = %s"
-    params = (id_sala,)
-    cursor.execute(query, params)
-    return cursor.fetchone()
+    return consultar_uno("SELECT * FROM funciones WHERE id_sala = %s", (id_sala,))

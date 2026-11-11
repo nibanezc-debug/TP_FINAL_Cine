@@ -1,6 +1,6 @@
-from cine_src.errors import ApiError
-from cine_src.repositories import consumos as repositorio
-from cine_src.validators.servicios import validar_id
+from errors import ApiError
+from repositories import consumos as repositorio
+from validators.servicios import validar_id
 
 def _validar_propietario(id_reserva: int, usuario: dict, permitir_admin: bool):
     reserva = repositorio.obtener_reserva(id_reserva)

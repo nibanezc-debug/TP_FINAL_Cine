@@ -1,4 +1,4 @@
-from cine_src.db import consultar_todos, consultar_uno, ejecutar
+from db import consultar_todos, consultar_uno, ejecutar
 
 def listar():
     return consultar_todos('SELECT id, nombre, precio FROM servicios WHERE activo = 1 ORDER BY id')

@@ -1,6 +1,6 @@
 from flask import Blueprint, Response, jsonify, request
-from cine_src.security import requiere_admin, usuario_actual
-from cine_src.services import entradas as servicio
+from security import requiere_admin, usuario_actual
+from services import entradas as servicio
 
 entradas_bp = Blueprint('entradas', __name__)
 
