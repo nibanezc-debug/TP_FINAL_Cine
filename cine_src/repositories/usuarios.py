@@ -41,14 +41,14 @@ def buscar_por_id(id_usuario: int):
                 
 def listar_todos():
     with obtener_conexion() as conexion:
-            cursor = conexion.cursor(dictionary=True)
-            try:
-                query = "SELECT id, nombre, email, password, rol FROM usuarios ORDER BY id ASC"
-                cursor.execute(query)
-                return cursor.fetchone()
-            finally:
-                cursor.close()
-                
+        cursor = conexion.cursor(dictionary=True)
+        try:
+            query = "SELECT id, nombre, email, rol, fecha_registro FROM usuarios ORDER BY id ASC"
+            cursor.execute(query)
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+
 def actualizar_usuario(id_usuario: int, nombre: str, email: str):
     with obtener_conexion() as conexion:
         cursor = conexion.cursor(dictionary=True)

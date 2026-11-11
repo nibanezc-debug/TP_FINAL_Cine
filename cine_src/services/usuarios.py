@@ -1,4 +1,5 @@
 from flask import session
+from werkzeug.security import generate_password_hash, check_password_hash
 from errors import ApiError
 from repositories import usuarios as repositorio
 from validators.usuarios import (
@@ -20,10 +21,14 @@ def _validar_permiso_usuario_o_admin(id_usuario: int, usuario_actual: dict):
 
 def registrar(datos: dict) -> dict:
     datos_validos = validar_registro(datos)
+    
+    # Encripta la contraseña antes de guardarla
+    password_hasheada = generate_password_hash(datos_validos['password'])
+    
     id_nuevo = repositorio.crear_usuario(
         datos_validos['nombre'],
         datos_validos['email'],
-        datos_validos['password']
+        password_hasheada
     )
     return {
         'mensaje': 'Usuario registrado exitosamente',
@@ -35,7 +40,8 @@ def login(datos: dict) -> dict:
     datos_validos = validar_login(datos)
     usuario = repositorio.buscar_por_email(datos_validos['email'])
     
-    if not usuario or usuario['password'] != datos_validos['password']:
+    # Compara el hash de la base de datos con la contraseña escrita por el usuario
+    if not usuario or not check_password_hash(usuario['password'], datos_validos['password']):
         raise ApiError('Credenciales inválidas', 401)
         
     session['id_usuario'] = usuario['id']

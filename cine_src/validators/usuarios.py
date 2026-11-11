@@ -59,10 +59,10 @@ def validar_actualizacion(datos: dict) -> dict:
         resultado['nombre'] = nombre.strip()
     
     if 'email' in datos:
-            email = datos['email']
-            if not isinstance(nombre, str) or not email.strip() or '@' not in email or len(email.strip()) >100:
-                raise ApiError('El email ingresado no es válido', 400)
-            resultado['email'] = email.strip().lower()
+        email = datos['email']
+        if not isinstance(email, str) or not email.strip() or '@' not in email or len(email.strip()) > 100:
+            raise ApiError('El email ingresado no es válido', 400)
+        resultado['email'] = email.strip().lower()
         
     if not resultado:
         raise ApiError('No se enviaron campos válidos para actualizar', 400)
