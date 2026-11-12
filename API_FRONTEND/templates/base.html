@@ -13,29 +13,82 @@
       <a class="brand" href="{{ url_for('cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
         <span class="brand-mark">CP</span><span>CINE <b>PARADISO</b></span>
       </a>
+
       <nav class="main-nav" aria-label="Navegación principal">
         <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('cartelera') }}">Cartelera</a>
         <a class="nav-link {% if active_page == 'butacas' %}active{% endif %}" href="{{ url_for('butacas') }}">Butacas</a>
         <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout') }}">Checkout</a>
         <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante') }}">Comprobante</a>
-        <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
-        <span class="nav-separator"></span>
-        <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('gestion') }}">Staff / Admin</a>
-        <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+
+        {% if session.get('usuario_id') %}
+          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
+        {% endif %}
+
+        {% if session.get('rol') == 'administrador' %}
+          <span class="nav-separator"></span>
+          <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('gestion') }}">Staff / Admin</a>
+          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% endif %}
       </nav>
-      <button class="button button-small button-ghost" id="loginBtn" type="button">Iniciar sesión</button>
+
+      {% if session.get('usuario_id') %}
+        <div class="profile-chip">
+          <span class="avatar">{{ session.get('email', 'U')[0] | upper }}</span>
+          <span>
+            <b>{{ session.get('email') }}</b>
+            <small>{{ session.get('rol') | capitalize }}</small>
+          </span>
+        </div>
+        <a class="button button-small button-ghost" href="{{ url_for('logout') }}">Cerrar sesión</a>
+      {% else %}
+        <button class="button button-small button-ghost" id="loginBtn" type="button" onclick="document.getElementById('loginModal').showModal()">
+          Iniciar sesión
+        </button>
+      {% endif %}
     </header>
 
     <main>
+      {% for mensaje in get_flashed_messages() %}
+        <div class="panel" style="border-color: var(--red); margin-top: 20px; color: #ff777d;">
+          {{ mensaje }}
+        </div>
+      {% endfor %}
+
       {% block content %}{% endblock %}
     </main>
 
     <footer class="footer">
       <span>© 2026 Cine Paradiso</span>
-      <span>Templates frontend · Hito 2 · Introducción al Desarrollo de Software</span>
+      <span>Hito 3 · Introducción al Desarrollo de Software (FIUBA)</span>
     </footer>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
+
+  <!-- Modal de Login con formulario POST tradicional hacia el servidor Flask -->
+  {% if not session.get('usuario_id') %}
+  <dialog class="modal" id="loginModal">
+    <div class="modal-head">
+      <h2>Iniciar sesión</h2>
+      <button class="icon-button" type="button" onclick="document.getElementById('loginModal').close()" aria-label="Cerrar">✕</button>
+    </div>
+    <form action="{{ url_for('login') }}" method="post">
+      <div class="field">
+        <span>EMAIL</span>
+        <input type="email" id="email" name="email" placeholder="admin@cineparadiso.com" required />
+      </div>
+      <div class="field">
+        <span>CONTRASEÑA</span>
+        <input type="password" id="password" name="password" placeholder="Tu contraseña" required />
+      </div>
+      <div class="modal-actions">
+        <button class="button button-ghost" type="button" onclick="document.getElementById('loginModal').close()">Cancelar</button>
+        <button class="button" type="submit">Ingresar</button>
+      </div>
+    </form>
+  </dialog>
+  {% endif %}
+
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>

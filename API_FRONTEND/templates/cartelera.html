@@ -8,6 +8,7 @@
     <h1>Elegí tu película y viví la experiencia.</h1>
     <p class="muted">Encontrá tu próxima película y reservá tus butacas en pocos pasos.</p>
   </div>
+
   <div class="filter-panel">
     <label class="field">
       <span>CINE</span>
@@ -27,14 +28,34 @@
       </select>
     </label>
   </div>
+
   <div class="section-heading">
     <div>
       <span class="eyebrow">SELECCIÓN DE LA SEMANA</span>
       <h2>En cartelera</h2>
     </div>
-    <span class="muted small" id="movieCount">6 películas · Todos los cines · Hoy</span>
+    <span class="muted small">{{ peliculas | length }} películas</span>
   </div>
-  <!-- Al conectar con el backend, podés iterar con Jinja {% for p in peliculas %} aquí -->
-  <div class="movie-grid" id="movieGrid"></div>
+
+  {# Sin id="movieGrid": el JS de demostración lo reemplazaría con datos falsos #}
+  <div class="movie-grid">
+    {% for p in peliculas %}
+    <article class="movie-card">
+      <div class="poster">
+        {% if p.poster_url %}
+        <img src="{{ p.poster_url }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2">
+        {% endif %}
+        <span>{{ p.titulo | upper }}</span>
+      </div>
+      <div class="movie-card-body">
+        <h3>{{ p.titulo }}</h3>
+        <div class="movie-meta">{{ p.genero }} · {{ p.clasificacion }} · {{ p.duracion_minutos }} min</div>
+        <a class="button" href="{{ url_for('butacas', id_pelicula=p.id_pelicula) }}">COMPRAR</a>
+      </div>
+    </article>
+    {% else %}
+    <p class="muted">No hay películas en cartelera.</p>
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}

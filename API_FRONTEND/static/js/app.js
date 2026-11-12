@@ -42,10 +42,17 @@ function toast(message) {
 
 const loginBtn = $('#loginBtn');
 if (loginBtn) {
-  loginBtn.addEventListener('click', () => toast('Inicio de sesión: conectar con el módulo de autenticación.'));
+  loginBtn.addEventListener('click', () => {
+    const modal = $('#loginModal');
+    if (modal) {
+      modal.showModal();
+    } else {
+      toast('Inicio de sesión: conectar con el módulo de autenticación.');
+    }
+  });
 }
 
-// --- 1. CARTELERA ---
+// CARTELERA
 function renderMovies() {
   const grid = $('#movieGrid');
   if (!grid) return;
@@ -85,7 +92,7 @@ if ($('#movieGrid')) {
   $('#dateFilter')?.addEventListener('change', updateMovieCount);
 }
 
-// --- 2. BUTACAS ---
+// BUTACAS
 function renderSeats() {
   const map = $('#seatMap');
   if (!map) return;
@@ -145,7 +152,7 @@ if ($('#seatMap')) {
   }));
 }
 
-// --- 3. CHECKOUT ---
+// CHECKOUT
 function renderSnacks() {
   const grid = $('#snackGrid');
   if (!grid) return;
@@ -227,7 +234,7 @@ if ($('#view-checkout')) {
   });
 }
 
-// --- 4. COMPROBANTE ---
+// COMPROBANTE
 function drawFakeQR() {
   const qr = $('#qrCode');
   if (!qr) return;
@@ -268,7 +275,7 @@ if ($('#view-comprobante')) {
   $('#downloadReceipt')?.addEventListener('click', () => window.print());
 }
 
-// --- 5. MIS ENTRADAS ---
+// MIS ENTRADAS
 function renderTickets() {
   const list = $('#ticketList');
   if (!list) return;
@@ -328,7 +335,7 @@ if ($('#ticketList')) {
   }));
 }
 
-// --- 6. GESTIÓN (BACKOFFICE) ---
+// GESTIÓN (BACKOFFICE) 
 function renderAdminMovies() {
   const tbody = $('#adminMovieRows');
   if (!tbody) return;
@@ -423,7 +430,7 @@ if ($('#view-gestion')) {
   });
 }
 
-// --- 7. DASHBOARD ---
+// DASHBOARD
 if ($('#view-dashboard')) {
   const hourValues = [30, 45, 60, 82, 96, 112, 140, 165, 230, 190, 155];
   const hourLabels = ['12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22'];
@@ -431,7 +438,7 @@ if ($('#view-dashboard')) {
     $('#hourChart').innerHTML = hourValues.map((v, i) => `
       <div class="bar-item ${i === 8 ? 'highlight' : ''}">
         <b>${v}</b>
-        <i style="height:${v / 240 * 100}%"></i>
+        <i style="height:${(v / 240) * 100}%"></i>
         <small>${hourLabels[i]}:00</small>
       </div>
     `).join('');

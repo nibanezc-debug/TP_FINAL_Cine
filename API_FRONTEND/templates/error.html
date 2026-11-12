@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Error {{ codigo }} · Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-error">
+  <div class="hero-copy">
+    <span class="eyebrow">ERROR {{ codigo }}</span>
+    <h1>{{ mensaje }}</h1>
+    <p class="muted">Hacé clic en Home para volver.</p>
+  </div>
+  <a class="button" href="{{ url_for('cartelera') }}">Home</a>
+</section>
+{% endblock %}
