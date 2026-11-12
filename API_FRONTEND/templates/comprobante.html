@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Comprobante | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-comprobante">
+  <div class="success-banner">
+    <span class="success-icon">✓</span>
+    <div>
+      <span class="eyebrow">¡COMPRA CONFIRMADA!</span>
+      <h1>Ya tenés tus entradas.</h1>
+      <p class="muted">Presentá el código QR en el ingreso a la sala.</p>
+    </div>
+  </div>
+  <div class="receipt-wrap">
+    <article class="receipt-card">
+      <div class="receipt-top"></div>
+      <div class="qr-area">
+        <div class="qr-code" id="qrCode" aria-label="Código QR ilustrativo"></div>
+        <strong class="mono" id="orderCode">CP-240937</strong>
+        <span class="muted tiny">Código de acceso</span>
+      </div>
+      <div class="receipt-film">
+        <h2>Órbita Perdida</h2>
+        <p class="muted small">Cine Paradiso · 2D · Subtitulada</p>
+        <div class="detail-grid">
+          <span><small>Fecha</small><b>13 Nov 2026</b></span>
+          <span><small>Hora</small><b>20:45 hs</b></span>
+          <span><small>Sala</small><b>Sala 3 · 2D</b></span>
+          <span><small>Butacas</small><b id="receiptSeats">F7, F8</b></span>
+        </div>
+      </div>
+      <div class="invoice-box">
+        <span class="eyebrow">FACTURA ELECTRÓNICA</span>
+        <div><span>Comprobante</span><b>Factura B N.º 0004-00240937</b></div>
+        <div><span>Emitida</span><b>05 nov 2026, 20:50 hs</b></div>
+        <div><span>CUIT emisor</span><b>30-71234567-9</b></div>
+        <div><span>Medio de pago</span><b id="receiptPayment">Visa •••• 4242</b></div>
+        <div class="invoice-total"><span>Total pagado</span><strong id="receiptTotal">$41.000</strong></div>
+      </div>
+      <div class="receipt-actions">
+        <button type="button" class="button button-ghost" id="downloadReceipt">↓ Descargar</button>
+        <a class="button" href="{{ url_for('entradas') }}">Listo</a>
+      </div>
+      <p class="demo-note">Vista de demostración: el QR y los datos fiscales definitivos deben ser generados por el backend.</p>
+    </article>
+  </div>
+</section>
+{% endblock %}

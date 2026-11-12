@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Mis Entradas | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-entradas">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">MI CUENTA</span>
+      <h1>Mis entradas</h1>
+      <p class="muted">Consultá tus próximas funciones y tu historial de compras.</p>
+    </div>
+    <div class="profile-chip">
+      <span class="avatar">LF</span>
+      <span><b>Lucía Fernández</b><small>Socio Gold</small></span>
+    </div>
+  </div>
+  <div class="tabs" id="ticketTabs">
+    <button type="button" class="tab active" data-filter="Todas">Todas <span>4</span></button>
+    <button type="button" class="tab" data-filter="Activo">Activas <span>2</span></button>
+    <button type="button" class="tab" data-filter="Usado">Usadas <span>1</span></button>
+    <button type="button" class="tab" data-filter="Cancelado">Canceladas <span>1</span></button>
+  </div>
+  <div class="ticket-list" id="ticketList"></div>
+</section>
+{% endblock %}

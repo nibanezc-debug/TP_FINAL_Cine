@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Selección de Butacas | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-butacas">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('cartelera') }}">← Volver a cartelera</a>
+      <h1>Elegí tus butacas</h1>
+      <p class="muted">Cine Paradiso · Alto Palermo · Sala 4 · 2D subtitulada · 155 min</p>
+    </div>
+    <span class="pill">ATP</span>
+  </div>
+  <div class="showtime-row">
+    <div>
+      <span class="eyebrow">HORARIOS DISPONIBLES</span>
+      <p class="muted small">Seleccioná una función</p>
+    </div>
+    <div class="showtimes">
+      <button type="button" class="time-button">14:30</button>
+      <button type="button" class="time-button">17:15</button>
+      <button type="button" class="time-button selected">19:45</button>
+      <button type="button" class="time-button">22:10</button>
+    </div>
+  </div>
+  <div class="panel seat-panel">
+    <div class="seat-intro">
+      <h2>Mapa de sala</h2>
+      <span class="muted small">General $6.900 por butaca</span>
+    </div>
+    <div class="screen-wrap">
+      <div class="screen-curve"></div>
+      <span>P A N T A L L A</span>
+    </div>
+    <div class="seat-map" id="seatMap" aria-label="Mapa interactivo de butacas"></div>
+    <div class="legend">
+      <span><i class="legend-seat available"></i> Disponible</span>
+      <span><i class="legend-seat occupied"></i> Ocupada</span>
+      <span><i class="legend-seat chosen"></i> Seleccionada</span>
+    </div>
+    <div class="seat-footer">
+      <div>
+        <span class="eyebrow">SELECCIONÁ HASTA 8 BUTACAS</span>
+        <strong id="selectedSeatsText">Ninguna seleccionada</strong>
+      </div>
+      <div class="total-box">
+        <span class="muted small">Total</span>
+        <strong id="seatTotal">$0</strong>
+      </div>
+      <button type="button" class="button" id="toCheckout" disabled>Continuar →</button>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Sistema de venta de entradas Cine Paradiso." />
+  <title>{% block title %}Cine Paradiso{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="{{ url_for('cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
+        <span class="brand-mark">CP</span><span>CINE <b>PARADISO</b></span>
+      </a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('cartelera') }}">Cartelera</a>
+        <a class="nav-link {% if active_page == 'butacas' %}active{% endif %}" href="{{ url_for('butacas') }}">Butacas</a>
+        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout') }}">Checkout</a>
+        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante') }}">Comprobante</a>
+        <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
+        <span class="nav-separator"></span>
+        <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('gestion') }}">Staff / Admin</a>
+        <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+      </nav>
+      <button class="button button-small button-ghost" id="loginBtn" type="button">Iniciar sesión</button>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <span>© 2026 Cine Paradiso</span>
+      <span>Templates frontend · Hito 2 · Introducción al Desarrollo de Software</span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
