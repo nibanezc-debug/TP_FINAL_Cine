@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Checkout | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-checkout">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('butacas') }}">← Volver a butacas</a>
+      <h1>Finalizá tu compra</h1>
+      <p class="muted">Revisá tu selección y agregá algo rico para disfrutar la función.</p>
+    </div>
+    <div class="steps">
+      <span class="done">1 Butacas</span>
+      <span class="done">2 Snacks</span>
+      <span class="current">3 Pago</span>
+    </div>
+  </div>
+  <div class="checkout-layout">
+    <div class="checkout-main">
+      <div class="panel film-summary">
+        <div class="poster poster-red poster-small"><span>HORIZONTE<br/>CARMESÍ</span></div>
+        <div class="film-info">
+          <span class="eyebrow">DETALLE DE TU ORDEN</span>
+          <h2>Órbita Perdida <span class="pill">+16</span></h2>
+          <p class="muted small">2D · Subtitulada · 2 h 08 min</p>
+          <div class="detail-grid">
+            <span>📍 Cine Paradiso — Alto Palermo</span>
+            <span>📅 Viernes 13 Nov 2026</span>
+            <span>🕘 Función 20:45 hs</span>
+            <span>🎟 Sala 3 · 2D</span>
+            <span>💺 Butacas <b id="checkoutSeatNames">F7, F8</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="panel snacks-panel">
+        <div class="section-heading compact">
+          <div>
+            <span class="eyebrow">SNACKS & CANDY</span>
+            <h2>¿Algo para acompañar?</h2>
+          </div>
+          <span class="muted small">Retiralo en el candy bar</span>
+        </div>
+        <div class="snack-grid" id="snackGrid"></div>
+      </div>
+    </div>
+    <aside class="panel payment-panel">
+      <span class="eyebrow">RESUMEN DE PAGO</span>
+      <h2>Tu compra</h2>
+      <div class="price-lines" id="priceLines"></div>
+      <div class="price-lines totals">
+        <div><span>Subtotal</span><b id="subtotalAmount">$0</b></div>
+        <div><span>Cargo por servicio</span><b id="serviceAmount">$0</b></div>
+        <div><span>IVA (21%)</span><b id="ivaAmount">$0</b></div>
+      </div>
+      <div class="grand-total">
+        <span>Total</span>
+        <strong id="grandTotal">$0</strong>
+      </div>
+      <div class="payment-method">
+        <span class="eyebrow">MÉTODO DE PAGO</span>
+        <label class="payment-option selected"><input type="radio" name="payment" value="Visa" checked/><span>💳 <b>Visa</b><small>•••• 4242 · Vence 09/28</small></span></label>
+        <label class="payment-option"><input type="radio" name="payment" value="Mastercard"/><span>💳 <b>Mastercard</b><small>•••• 8817 · Vence 03/27</small></span></label>
+        <label class="payment-option"><input type="radio" name="payment" value="Billetera digital"/><span>▣ <b>Billetera digital</b><small>Pago con QR o app</small></span></label>
+      </div>
+      <button type="button" class="button button-full" id="confirmPurchase">Confirmar pago</button>
+      <p class="secure-note">🔒 Pago seguro encriptado con SSL de 256 bits</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}

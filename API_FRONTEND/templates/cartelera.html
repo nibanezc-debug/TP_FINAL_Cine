@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Cartelera | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-cartelera">
+  <div class="hero-copy">
+    <span class="eyebrow">BIENVENIDO A CINE PARADISO</span>
+    <h1>Elegí tu película y viví la experiencia.</h1>
+    <p class="muted">Encontrá tu próxima película y reservá tus butacas en pocos pasos.</p>
+  </div>
+  <div class="filter-panel">
+    <label class="field">
+      <span>CINE</span>
+      <select id="cinemaFilter">
+        <option value="Todos los cines">Todos los cines</option>
+        <option>Cine Paradiso — Alto Palermo</option>
+        <option>Cine Paradiso — Caballito</option>
+        <option>Cine Paradiso — Belgrano</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>FECHA</span>
+      <select id="dateFilter">
+        <option>Hoy</option>
+        <option>Mañana</option>
+        <option>Próximos 7 días</option>
+      </select>
+    </label>
+  </div>
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">SELECCIÓN DE LA SEMANA</span>
+      <h2>En cartelera</h2>
+    </div>
+    <span class="muted small" id="movieCount">6 películas · Todos los cines · Hoy</span>
+  </div>
+  <!-- Al conectar con el backend, podés iterar con Jinja {% for p in peliculas %} aquí -->
+  <div class="movie-grid" id="movieGrid"></div>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Dashboard de Estadísticas | Backoffice Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-dashboard">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">BACKOFFICE · ADMINISTRACIÓN</span>
+      <h1>Dashboard de estadísticas</h1>
+      <p class="muted">Una visión general del rendimiento de Cine Paradiso.</p>
+    </div>
+    <button type="button" class="button button-ghost" id="exportReport">↓ Exportar reporte</button>
+  </div>
+  <div class="dashboard-filters">
+    <div class="segmented">
+      <button type="button" class="active">Hoy</button>
+      <button type="button">7 días</button>
+      <button type="button">30 días</button>
+    </div>
+    <label class="field inline-field"><span>FECHA</span><input type="date" value="2026-11-04"/></label>
+    <label class="field inline-field"><span>SEDE</span><select><option>Todas las salas</option><option>Alto Palermo</option><option>Caballito</option></select></label>
+  </div>
+  <div class="kpi-grid">
+    <article class="panel kpi"><span>Ventas totales</span><strong>$186.480</strong><small class="positive">↗ 18,6% vs. período anterior</small></article>
+    <article class="panel kpi"><span>Tasa de ocupación</span><strong>72,4%</strong><small class="positive">↗ 4,2 puntos</small></article>
+    <article class="panel kpi"><span>Funciones activas</span><strong>24</strong><small class="muted">En 4 salas en operación</small></article>
+    <article class="panel kpi"><span>Cancelaciones totales</span><strong>18</strong><small class="negative">↘ 2,6% de las transacciones</small></article>
+  </div>
+  <div class="chart-grid">
+    <article class="panel chart-panel">
+      <div class="section-heading compact">
+        <div>
+          <h2>Venta de boletos por hora</h2>
+          <p class="muted small">Distribución de entradas vendidas durante el día</p>
+        </div>
+        <span class="muted tiny">● Boletos vendidos</span>
+      </div>
+      <div class="bar-chart" id="hourChart"></div>
+      <div class="chart-foot muted tiny">La franja de las 20:00 presenta el mayor nivel de ventas.</div>
+    </article>
+    <article class="panel chart-panel">
+      <div class="section-heading compact">
+        <div>
+          <h2>Ventas por género</h2>
+          <p class="muted small">Participación sobre los boletos vendidos</p>
+        </div>
+      </div>
+      <div class="genre-layout">
+        <div class="donut">
+          <div><b>1.554</b><small>boletos vendidos</small></div>
+        </div>
+        <div class="genre-legend">
+          <span><i></i> Acción <b>40%</b></span>
+          <span><i></i> Animación <b>25%</b></span>
+          <span><i></i> Drama <b>18%</b></span>
+          <span><i></i> Terror <b>10%</b></span>
+          <span><i></i> Comedia <b>7%</b></span>
+        </div>
+      </div>
+    </article>
+    <article class="panel chart-panel occupancy">
+      <div class="section-heading compact">
+        <div>
+          <h2>Ocupación por película / función</h2>
+          <p class="muted small">Las funciones con mayor venta del día</p>
+        </div>
+        <span class="muted tiny">Ver las 24 funciones →</span>
+      </div>
+      <div class="occupancy-list" id="occupancyList"></div>
+    </article>
+    <article class="panel chart-panel channels">
+      <h2>Canales de venta</h2>
+      <p class="muted small">Ingresos y participación por canal</p>
+      <div class="channel-row"><span>Web y app</span><b>$128.640</b><div class="progress"><i style="width:69%"></i></div><small>1.067 boletos · 69%</small></div>
+      <div class="channel-row"><span>Taquilla</span><b>$59.940</b><div class="progress"><i style="width:31%"></i></div><small>487 boletos · 31%</small></div>
+      <div class="average-ticket"><span class="muted">Precio promedio por boleto</span><strong>$120,00</strong></div>
+    </article>
+  </div>
+  <p class="data-note">Datos ilustrativos para demostrar el template. Los indicadores definitivos se obtendrán de los endpoints de estadísticas.</p>
+</section>
+{% endblock %}

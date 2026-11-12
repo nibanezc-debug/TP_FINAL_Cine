@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Películas | Backoffice Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-gestion">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">BACKOFFICE · STAFF / ADMIN</span>
+      <h1>Gestión de películas</h1>
+      <p class="muted">Administrá el catálogo y validá entradas desde un único lugar.</p>
+    </div>
+    <button type="button" class="button" id="addMovie">+ Nueva película</button>
+  </div>
+  <div class="admin-layout">
+    <div class="panel admin-movies">
+      <div class="section-heading compact">
+        <div>
+          <h2>Catálogo</h2>
+          <span class="muted small" id="adminCount">6 películas</span>
+        </div>
+        <button type="button" class="button button-ghost button-small" id="importMovies">↻ Importar externas</button>
+      </div>
+      <div class="toolbar">
+        <input id="movieSearch" type="search" placeholder="Buscar por título o director..."/>
+        <select id="statusFilter">
+          <option value="Todos">Todos los estados</option>
+          <option>En cartelera</option>
+          <option>Próximamente</option>
+          <option>Inactiva</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Película</th>
+              <th>Género</th>
+              <th>Duración</th>
+              <th>Clasif.</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="adminMovieRows"></tbody>
+        </table>
+      </div>
+    </div>
+    <aside class="panel validator">
+      <span class="eyebrow">CONTROL DE ACCESO</span>
+      <h2>Escanear QR</h2>
+      <p class="muted small">Validá las entradas antes de permitir el acceso a la sala.</p>
+      <div class="camera-box">
+        <span class="camera-corners">▣</span>
+        <span>Vista previa de cámara</span>
+        <small>La cámara requiere permisos del navegador</small>
+        <button type="button" class="button button-ghost button-small" id="cameraBtn">Activar cámara</button>
+      </div>
+      <div class="or-line">o ingresá el código</div>
+      <label class="field">
+        <span>CÓDIGO DE ENTRADA</span>
+        <input id="qrInput" placeholder="Ej. CP-240937"/>
+      </label>
+      <button type="button" class="button button-full" id="validateQr">Validar QR</button>
+      <div class="validation-result" id="validationResult">
+        <span class="muted small">Esperando validación…</span>
+      </div>
+    </aside>
+  </div>
+
+  <dialog id="movieDialog" class="modal">
+    <form method="dialog" id="movieForm">
+      <div class="modal-head">
+        <h2 id="movieDialogTitle">Nueva película</h2>
+        <button type="submit" class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">✕</button>
+      </div>
+      <label class="field">
+        <span>TÍTULO</span>
+        <input name="title" required placeholder="Nombre de la película"/>
+      </label>
+      <div class="form-two">
+        <label class="field">
+          <span>GÉNERO</span>
+          <input name="genre" required placeholder="Drama"/>
+        </label>
+        <label class="field">
+          <span>DURACIÓN (MIN)</span>
+          <input name="duration" type="number" min="1" required placeholder="120"/>
+        </label>
+      </div>
+      <div class="form-two">
+        <label class="field">
+          <span>CLASIFICACIÓN</span>
+          <select name="rating">
+            <option>ATP</option>
+            <option>+13</option>
+            <option>+16</option>
+            <option>+18</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>ESTADO</span>
+          <select name="status">
+            <option>En cartelera</option>
+            <option>Próximamente</option>
+            <option>Inactiva</option>
+          </select>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="button button-ghost" value="cancel" formnovalidate>Cancelar</button>
+        <button type="submit" class="button" id="saveMovie" value="default">Guardar película</button>
+      </div>
+    </form>
+  </dialog>
+</section>
+{% endblock %}
