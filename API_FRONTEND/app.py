@@ -14,12 +14,12 @@ def mostrar_error(e):
 def crear_app():
     app = Flask(__name__)
 
-    app.secret_key = os.getenv("FLASK_SECRET_KEY")
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave_secreta_frontend")
     if not app.secret_key:
         raise RuntimeError("Es necesario configurar FLASK_SECRET_KEY")
 
     app.config["API_URL"] = os.getenv("API_URL", "http://127.0.0.1:5000/api")
-    # Las cookies no distinguen puertos: sin esto, front y back se pisan la cookie "session".
+    # Las cookies no distinguen puertos, sin esto, front y back se pisan la cookie "session"
     app.config["SESSION_COOKIE_NAME"] = "cine_front"
 
     for codigo in CODIGOS_ERROR:
@@ -35,21 +35,33 @@ def crear_app():
         password = request.form.get("password", "")
 
         try:
-            # SUPUESTO: la ruta es /api/usuarios/login. Confirmarlo en routes/usuarios.py
-            datos, resp = llamar_api(
-                "POST", "/auth/login", json={"email": email, "password": password}
-            )
+            # (usuarios/login)
+            try:
+                datos, resp = llamar_api(
+                    "POST", "/usuarios/login", json={"email": email, "password": password}
+                )
+            except HTTPException as e:
+                # 2. Si no la encuentra (404), intentamos la alternativa (auth/login)
+                if e.code == 404:
+                    datos, resp = llamar_api(
+                        "POST", "/auth/login", json={"email": email, "password": password}
+                    )
+                else:
+                    raise e
         except HTTPException as e:
             flash(e.description)
             return redirect(url_for("cartelera"))
 
         datos = datos or {}
         usuario = datos.get("usuario", datos)
-        if "id" not in usuario:
+        
+        id_usuario = usuario.get("id_usuario") or usuario.get("id")
+        
+        if not id_usuario:
             flash("Respuesta inesperada del backend.")
             return redirect(url_for("cartelera"))
 
-        session["usuario_id"] = usuario["id"]
+        session["usuario_id"] = id_usuario
         session["email"] = usuario.get("email", email)
         session["rol"] = usuario.get("rol", "cliente")
         session["api_cookies"] = resp.cookies.get_dict()
@@ -70,7 +82,6 @@ def crear_app():
         return render_template("cartelera.html", active_page="cartelera", peliculas=peliculas)
     
     app.register_blueprint(butacas_bp)
-
     app.register_blueprint(funcion_bp)
 
     @app.route("/checkout")
