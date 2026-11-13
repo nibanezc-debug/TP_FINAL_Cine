@@ -37,18 +37,9 @@
     <div class="showtime-cards">
       {% for f in funciones %}
         <label class="showtime-card">
-<<<<<<< HEAD
-          <input type="radio" name="id_funcion" value="{{ f.id }}" required />
-          {# fecha_hora llega como "2026-11-14T20:30:00" #}
-          <span class="muted small">{{ f.fecha_hora[8:10] }}/{{ f.fecha_hora[5:7] }}/{{ f.fecha_hora[:4] }}</span>
-          <strong class="showtime-hour">{{ f.fecha_hora[11:16] }}</strong>
-          <span class="small">{{ f.local }}</span>
-          <span class="muted small">{{ f.sala }} · ${{ f.precio }}</span>
-=======
           <input type="radio" name="id_funcion" value="{{ f.id_funcion or f.id }}" required />
           <strong class="showtime-hour">{{ f.fecha_hora }}</strong>
           <span class="muted small">{{ f.sala | default('Sala') }} · ${{ f.precio }}</span>
->>>>>>> feature/butacas_rutas
         </label>
       {% else %}
         {% if filtros %}

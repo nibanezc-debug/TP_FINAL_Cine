@@ -10,13 +10,8 @@ TEMPLATES_POR_CAPACIDAD = {
 }
 
 
-<<<<<<< HEAD
-@butacas_bp.route("/funcion/<int:id_funcion>/butacas", methods=["GET"])
-def vista_butacas(id_funcion):
-=======
 @butacas_bp.route("/cartelera/funcion/<int:id>/butacas", methods=["GET"])
 def vista_butacas(id):
->>>>>>> feature/butacas_rutas
     # llamar_api devuelve la tupla (datos, resp); si hay error en el backend hace abort() solo
     butacas, _ = llamar_api("GET", f"/funciones/{id_funcion}/butacas", con_sesion=False)
     funcion, _ = llamar_api("GET", f"/funciones/{id_funcion}")
