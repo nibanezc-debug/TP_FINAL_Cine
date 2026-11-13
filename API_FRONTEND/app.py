@@ -139,6 +139,25 @@ def crear_app():
     return app
 
 
+@app.route("/registro")
+def registro():
+    return render_template("registro.html", active_page="registro")
+
+
+@app.route("/login")
+def login():
+    return render_template("login.html", active_page="login")
+
+
+@app.route("/perfil")
+def perfil():
+    return render_template("perfil.html", usuario={}, active_page="perfil")
+
+
+@app.route("/usuarios")
+def listar_usuarios():
+    return render_template("usuarios.html", usuarios=[], active_page="usuarios")
+
 if __name__ == "__main__":
     app_front = crear_app()
     app_front.run(host="127.0.0.1", port=5001, debug=True)

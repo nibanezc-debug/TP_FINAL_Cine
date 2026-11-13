@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Usuarios | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-usuarios">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">BACKOFFICE · ADMINISTRACIÓN</span>
+      <h1>Usuarios registrados</h1>
+      <p class="muted">Listado general de clientes y administradores del sistema.</p>
+    </div>
+    <span class="pill">{{ usuarios | length }} USUARIOS</span>
+  </div>
+
+  <div class="panel">
+    {% if usuarios %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <th style="padding: 0.75rem;">ID</th>
+              <th style="padding: 0.75rem;">Nombre</th>
+              <th style="padding: 0.75rem;">Email</th>
+              <th style="padding: 0.75rem;">Rol</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in usuarios %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 0.75rem;">#{{ u.id_usuario or u.id }}</td>
+              <td style="padding: 0.75rem;">{{ u.nombre }}</td>
+              <td style="padding: 0.75rem;">{{ u.email }}</td>
+              <td style="padding: 0.75rem;"><span class="pill">{{ u.rol }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No hay usuarios para mostrar.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
