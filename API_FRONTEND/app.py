@@ -48,5 +48,24 @@ def dashboard():
     return render_template("dashboard.html", active_page="dashboard")
 
 
+@app.route("/registro")
+def registro():
+    return render_template("registro.html", active_page="registro")
+
+
+@app.route("/login")
+def login():
+    return render_template("login.html", active_page="login")
+
+
+@app.route("/perfil")
+def perfil():
+    return render_template("perfil.html", usuario={}, active_page="perfil")
+
+
+@app.route("/usuarios")
+def listar_usuarios():
+    return render_template("usuarios.html", usuarios=[], active_page="usuarios")
+
 if __name__ == "__main__":
     app.run(port=5001, debug=True)
