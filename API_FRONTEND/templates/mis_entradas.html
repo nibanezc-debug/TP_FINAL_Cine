@@ -9,17 +9,28 @@
       <h1>Mis entradas</h1>
       <p class="muted">Consultá tus próximas funciones y tu historial de compras.</p>
     </div>
-    <div class="profile-chip">
-      <span class="avatar">LF</span>
-      <span><b>Lucía Fernández</b><small>Socio Gold</small></span>
-    </div>
   </div>
-  <div class="tabs" id="ticketTabs">
-    <button type="button" class="tab active" data-filter="Todas">Todas <span>4</span></button>
-    <button type="button" class="tab" data-filter="Activo">Activas <span>2</span></button>
-    <button type="button" class="tab" data-filter="Usado">Usadas <span>1</span></button>
-    <button type="button" class="tab" data-filter="Cancelado">Canceladas <span>1</span></button>
+  <div class="ticket-list">
+    {% for e in entradas %}
+    <article class="panel" style="display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px;">
+      <div>
+        <span class="pill">{{ e.estado | capitalize }}</span>
+        <h3 style="margin:8px 0 4px;">Función #{{ e.id_funcion }}</h3>
+        <p class="muted small">📅 {{ e.fecha_hora_funcion[:10] }} · 🕘 {{ e.fecha_hora_funcion[11:16] }} hs · 💺 Butaca #{{ e.id_butaca }}</p>
+      </div>
+      <div style="text-align:right;">
+        <b>${{ e.precio }}</b><br />
+        {% if e.estado == 'activa' %}
+        <form action="{{ url_for('entradas.cancelar_entrada', id_entrada=e.id) }}" method="post"
+              onsubmit="return confirm('¿Seguro que querés cancelar esta entrada?');">
+          <button type="submit" class="button button-small button-ghost">Cancelar</button>
+        </form>
+        {% endif %}
+      </div>
+    </article>
+    {% else %}
+    <p class="muted">Todavía no compraste entradas. ¡Entrá a la cartelera y elegí tu función!</p>
+    {% endfor %}
   </div>
-  <div class="ticket-list" id="ticketList"></div>
 </section>
 {% endblock %}

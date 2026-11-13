@@ -16,11 +16,11 @@
 
       <nav class="main-nav" aria-label="Navegación principal">
         <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('cartelera') }}">Cartelera</a>
-        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout') }}">Checkout</a>
-        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante') }}">Comprobante</a>
+        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout.vista_checkout') }}">Checkout</a>
+        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante.vista_comprobante') }}">Comprobante</a>
 
         {% if session.get('usuario_id') %}
-          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
+          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas.vista_entradas') }}">Mis entradas</a>
         {% endif %}
 
         {% if session.get('rol') == 'administrador' %}

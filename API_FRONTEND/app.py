@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.exceptions import HTTPException
 from web.routes.site.butacas import butacas_bp
 from web.routes.site.funcion import funcion_bp
+from web.routes.site.entradas import checkout_bp, comprobante_bp, entradas_bp
 
 from api_client import llamar_api, CODIGOS_ERROR
 
@@ -83,20 +84,9 @@ def crear_app():
     
     app.register_blueprint(butacas_bp)
     app.register_blueprint(funcion_bp)
-
-    @app.route("/checkout")
-    def checkout():
-        return render_template("checkout.html", active_page="checkout")
-
-    @app.route("/comprobante")
-    def comprobante():
-        return render_template("comprobante.html", active_page="comprobante")
-
-    @app.route("/entradas")
-    def entradas():
-        if not session.get("usuario_id"):
-            return redirect(url_for("cartelera"))
-        return render_template("mis_entradas.html", active_page="entradas")
+    app.register_blueprint(checkout_bp)
+    app.register_blueprint(comprobante_bp)
+    app.register_blueprint(entradas_bp)
 
     @app.route("/gestion")
     def gestion():
