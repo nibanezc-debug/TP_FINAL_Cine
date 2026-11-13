@@ -7,10 +7,15 @@
     <div>
       <a class="back-link" href="{{ url_for('cartelera') }}">← Volver a cartelera</a>
       <h1>Elegí tus butacas</h1>
-      <p class="muted">Cine Paradiso · Alto Palermo · Sala 4 · 2D subtitulada · 155 min</p>
+      <p class="muted">
+        {{ funcion.local | default('Cine Paradiso · Alto Palermo') }} ·
+        {{ funcion.sala | default('Sala 4') }} ·
+        {% block capacidad_sala %}Capacidad estándar{% endblock %}
+      </p>
     </div>
-    <span class="pill">ATP</span>
+    <span class="pill">{{ funcion.clasificacion | default('ATP') }}</span>
   </div>
+
   <div class="showtime-row">
     <div>
       <span class="eyebrow">HORARIOS DISPONIBLES</span>
@@ -23,22 +28,28 @@
       <button type="button" class="time-button">22:10</button>
     </div>
   </div>
+
   <div class="panel seat-panel">
     <div class="seat-intro">
       <h2>Mapa de sala</h2>
-      <span class="muted small">General $6.900 por butaca</span>
+      <span class="muted small">General ${{ funcion.precio | default(6900) }} por butaca</span>
     </div>
+
     <div class="screen-wrap">
       <div class="screen-curve"></div>
       <span>P A N T A L L A</span>
     </div>
-    <div class="seat-map" id="seatMap" aria-label="Mapa interactivo de butacas"></div>
+
+    {# Acá cada template hijo inserta su grilla hardcodeada #}
+    {% block mapa_butacas %}{% endblock %}
+
     <div class="legend">
       <span><i class="legend-seat available"></i> Disponible</span>
       <span><i class="legend-seat occupied"></i> Ocupada</span>
       <span><i class="legend-seat chosen"></i> Seleccionada</span>
     </div>
-    <div class="seat-footer">
+
+    <form method="POST" action="{{ url_for('butacas.seleccionar_butacas', id=funcion.id) }}" class="seat-footer">
       <div>
         <span class="eyebrow">SELECCIONÁ HASTA 8 BUTACAS</span>
         <strong id="selectedSeatsText">Ninguna seleccionada</strong>
@@ -47,8 +58,12 @@
         <span class="muted small">Total</span>
         <strong id="seatTotal">$0</strong>
       </div>
-      <button type="button" class="button" id="toCheckout" disabled>Continuar →</button>
-    </div>
+
+      <input type="hidden" name="butacas_ids" id="butacasIdsInput" required />
+      <input type="hidden" name="butacas_labels" id="butacasLabelsInput" />
+
+      <button type="submit" class="button" id="toCheckout" disabled>Continuar →</button>
+    </form>
   </div>
 </section>
 {% endblock %}

@@ -1,13 +1,17 @@
 #!/bin/bash
-# Recrea la base desde cero. BORRA los datos existentes solo para desarrollo.
+# Recrea la base desde cero dentro del contenedor Docker. BORRA los datos existentes.
 set -e
-if [ -z "$DB_PASSWORD" ]; then
-  echo "Falta exportar DB_PASSWORD" >&2
-  exit 1
-fi
-export MYSQL_PWD="$DB_PASSWORD"
-MYSQL="mysql -h ${DB_HOST:-127.0.0.1} -P ${DB_PORT:-3306} -u ${DB_USER:-root}"
+
+DB_PASSWORD="${DB_PASSWORD:-lanzillotta}"
+DB_USER="${DB_USER:-root}"
+CONTAINER_NAME="${CONTAINER_NAME:-docker-db-1}"
+
 cd "$(dirname "$0")" || exit 1
+
+MYSQL="docker exec -i -e MYSQL_PWD=$DB_PASSWORD $CONTAINER_NAME mysql -u $DB_USER --default-character-set=utf8mb4"
+
 $MYSQL -e "DROP DATABASE IF EXISTS cine_paradiso;"
 $MYSQL < schema_tablas_cine.sql
-$MYSQL < seed.sql
+$MYSQL cine_paradiso < seed.sql
+
+echo "Base de datos cine_paradiso recreada correctamente."

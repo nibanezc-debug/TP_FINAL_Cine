@@ -486,12 +486,33 @@ button {
   box-shadow: 0 -10px 25px #fff1;
 }
 
-.seat-map {
-  display: grid;
-  grid-template-columns: repeat(14, minmax(18px, 30px));
-  justify-content: center;
-  gap: 9px 8px;
-  margin: 0 auto 22px;
+.seat-panel {
+  padding: 25px;
+  overflow-x: auto;
+}
+
+.seat-map-120 {
+  grid-template-columns: repeat(12, 30px);
+}
+.seat-map-120 .seat:nth-child(12n + 3),
+.seat-map-120 .seat:nth-child(12n + 9) {
+  margin-right: 16px;
+}
+
+.seat-map-250 {
+  grid-template-columns: repeat(25, 26px);
+}
+.seat-map-250 .seat:nth-child(25n + 6),
+.seat-map-250 .seat:nth-child(25n + 19) {
+  margin-right: 18px;
+}
+
+.seat-map-450 {
+  grid-template-columns: repeat(30, 24px);
+}
+.seat-map-450 .seat:nth-child(30n + 8),
+.seat-map-450 .seat:nth-child(30n + 22) {
+  margin-right: 18px;
 }
 
 .seat {

@@ -13,7 +13,6 @@ def listar_cartelera():
 
 
 @funciones_bp.get("/funciones")
-@requiere_usuario
 def listar_funciones():
     return jsonify(servicio.listar_funciones(request.args)), 200
 

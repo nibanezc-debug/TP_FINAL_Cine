@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ pelicula.titulo | default('Detalle de película') }} | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-detalle-pelicula">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('cartelera') }}">← Volver a cartelera</a>
+    </div>
+  </div>
+
+  <div class="panel movie-hero">
+    <div class="movie-poster-box">
+      <img
+        src="{{ pelicula.poster_url or url_for('static', filename='img/placeholder.jpg') }}"
+        alt="Póster de {{ pelicula.titulo }}"
+      />
+    </div>
+
+    <div class="movie-info-box">
+      <div class="movie-meta">
+        {% if pelicula.clasificacion %}<span class="pill">{{ pelicula.clasificacion }}</span>{% endif %}
+        {% if pelicula.genero %}<span class="muted small">{{ pelicula.genero }}</span>{% endif %}
+        {% if pelicula.duracion_minutos %}<span class="muted small">· {{ pelicula.duracion_minutos }} min</span>{% endif %}
+      </div>
+
+      <h1>{{ pelicula.titulo }}</h1>
+      <p class="movie-synopsis">{{ pelicula.sinopsis or 'Sin sinopsis disponible.' }}</p>
+    </div>
+  </div>
+
+  <!-- BLOQUE INFERIOR: Rectángulos de horarios + Botón abajo a la derecha -->
+  <form method="POST" class="panel showtime-selector-panel">
+    <span class="eyebrow">FUNCIONES DISPONIBLES</span>
+    <h2>Elegí un horario</h2>
+
+    <div class="showtime-cards">
+      {% for f in funciones %}
+        <label class="showtime-card">
+          <input type="radio" name="id_funcion" value="{{ f.id }}" required />
+          <strong class="showtime-hour">{{ f.fecha_hora }}</strong>
+          <span class="muted small">{{ f.sala | default('Sala') }} · ${{ f.precio }}</span>
+        </label>
+      {% else %}
+        <p class="muted">No hay funciones programadas para esta película.</p>
+      {% endfor %}
+    </div>
+
+    <div class="bottom-right-action">
+      <button type="submit" class="button" id="btnElegirButacas" disabled>
+        Elegir butacas →
+      </button>
+    </div>
+  </form>
+</section>
+
+<script>
+  document.querySelectorAll('input[name="id_funcion"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.getElementById('btnElegirButacas').disabled = false;
+    });
+  });
+</script>
+{% endblock %}

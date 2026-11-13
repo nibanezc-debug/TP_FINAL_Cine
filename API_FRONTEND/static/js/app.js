@@ -93,59 +93,39 @@ if ($('#movieGrid')) {
 }
 
 // BUTACAS
-function renderSeats() {
-  const map = $('#seatMap');
-  if (!map) return;
-  map.innerHTML = '';
-  const rows = 'ABCDEFGHIJ'.split('');
-  rows.forEach(r => {
-    for (let c = 1; c <= 14; c++) {
-      const num = c <= 3 ? c : c <= 11 ? c - 1 : c - 2;
-      const seatId = `${r}${num}`;
-      const aisle = c === 4 || c === 12;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'seat' + (aisle ? ' aisle' : '');
-      btn.textContent = aisle ? '' : num;
-      btn.setAttribute('aria-label', aisle ? 'Pasillo' : `Butaca ${seatId}`);
-      const occupied = ['J1','J2','J3','J4','J5','J6','J7','J8','J9','J10','J11','J12'].includes(seatId);
+// --- 2. BUTACAS (renderizadas desde Jinja) ---
+const map = $('#seatMap');
+if (map) {
+  let seleccionadas = []; // [{ id: "613", label: "A1" }, ...]
+  const precioUnitario = Number(map.dataset.precio || 6900);
 
-      if (occupied) {
-        btn.classList.add('occupied');
-        btn.disabled = true;
-      } else if (selectedSeats.includes(seatId)) {
+  $$('#seatMap .seat:not(.occupied)').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const label = btn.dataset.label;
+      const existe = seleccionadas.some(s => s.id === id);
+
+      if (existe) {
+        seleccionadas = seleccionadas.filter(s => s.id !== id);
+        btn.classList.remove('selected');
+      } else if (seleccionadas.length < 8) {
+        seleccionadas.push({ id, label });
         btn.classList.add('selected');
+      } else {
+        toast('Podés seleccionar hasta 8 butacas.');
       }
 
-      if (!aisle && !occupied) {
-        btn.addEventListener('click', () => {
-          if (selectedSeats.includes(seatId)) {
-            selectedSeats = selectedSeats.filter(x => x !== seatId);
-          } else if (selectedSeats.length < 8) {
-            selectedSeats.push(seatId);
-          } else {
-            toast('Podés seleccionar hasta 8 butacas.');
-          }
-          sessionStorage.setItem('cp_selected_seats', JSON.stringify(selectedSeats));
-          renderSeats();
-        });
-      }
-      map.appendChild(btn);
-    }
+      $('#selectedSeatsText').textContent = seleccionadas.length
+        ? seleccionadas.map(s => s.label).join(', ')
+        : 'Ninguna seleccionada';
+      $('#seatTotal').textContent = money(seleccionadas.length * precioUnitario);
+      $('#toCheckout').disabled = seleccionadas.length === 0;
+
+      $('#butacasIdsInput').value = seleccionadas.map(s => s.id).join(',');
+      $('#butacasLabelsInput').value = seleccionadas.map(s => s.label).join(', ');
+    });
   });
 
-  $('#selectedSeatsText').textContent = selectedSeats.length ? selectedSeats.sort().join(', ') : 'Ninguna seleccionada';
-  $('#seatTotal').textContent = money(selectedSeats.length * 6900);
-  $('#toCheckout').disabled = selectedSeats.length === 0;
-}
-
-if ($('#seatMap')) {
-  renderSeats();
-  $('#toCheckout')?.addEventListener('click', () => {
-    if (!selectedSeats.length) return;
-    sessionStorage.setItem('cp_selected_seats', JSON.stringify(selectedSeats));
-    window.location.href = '/checkout';
-  });
   $$('.time-button').forEach(b => b.addEventListener('click', () => {
     $$('.time-button').forEach(x => x.classList.remove('selected'));
     b.classList.add('selected');

@@ -1,0 +1,19 @@
+{% extends "butacas.html" %}
+{% block capacidad_sala %}Sala XL (450 butacas){% endblock %}
+
+{% block mapa_butacas %}
+<div class="seat-map seat-map-450" id="seatMap" data-precio="{{ funcion.precio | default(6900) }}" aria-label="Mapa de sala 450 butacas">
+  {% for b in butacas %}
+    {% set ocupada = b.estado != 'disponible' %}
+    <button
+      type="button"
+      class="seat {% if ocupada %}occupied{% endif %}"
+      data-id="{{ b.id }}"
+      data-label="{{ b.fila }}{{ b.columna }}"
+      title="Fila {{ b.fila }} · Butaca {{ b.columna }}"
+      {% if ocupada %}disabled{% endif %}>
+      {{ b.columna }}
+    </button>
+  {% endfor %}
+</div>
+{% endblock %}

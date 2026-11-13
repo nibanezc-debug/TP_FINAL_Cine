@@ -50,7 +50,7 @@
       <div class="movie-card-body">
         <h3>{{ p.titulo }}</h3>
         <div class="movie-meta">{{ p.genero }} · {{ p.clasificacion }} · {{ p.duracion_minutos }} min</div>
-        <a class="button" href="{{ url_for('butacas', id_pelicula=p.id_pelicula) }}">COMPRAR</a>
+        <a class="button" href="{{ url_for('funcion.get_funciones', id_pelicula=p.id_pelicula) }}">COMPRAR</a>
       </div>
     </article>
     {% else %}

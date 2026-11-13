@@ -1,6 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.exceptions import HTTPException
+from web.routes.site.butacas import butacas_bp
+from web.routes.site.funcion import funcion_bp
 
 from api_client import llamar_api, CODIGOS_ERROR
 
@@ -35,7 +37,7 @@ def crear_app():
         try:
             # SUPUESTO: la ruta es /api/usuarios/login. Confirmarlo en routes/usuarios.py
             datos, resp = llamar_api(
-                "POST", "/usuarios/login", json={"email": email, "password": password}
+                "POST", "/auth/login", json={"email": email, "password": password}
             )
         except HTTPException as e:
             flash(e.description)
@@ -67,9 +69,9 @@ def crear_app():
         peliculas = (datos or {}).get("peliculas", [])
         return render_template("cartelera.html", active_page="cartelera", peliculas=peliculas)
     
-    @app.route("/butacas")
-    def butacas():
-        return render_template("butacas.html", active_page="butacas")
+    app.register_blueprint(butacas_bp)
+
+    app.register_blueprint(funcion_bp)
 
     @app.route("/checkout")
     def checkout():
