@@ -30,12 +30,22 @@ def crear_app():
     def index():
         return redirect(url_for("cartelera"))
 
-    @app.route("/login", methods=["POST"])
+    @app.route("/login", methods=["GET", "POST"])
     def login():
+        if request.method == "GET":
+            return """
+            <form method="POST" action="/login">
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Entrar</button>
+            </form>
+            """
+
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
 
         try:
+<<<<<<< HEAD
             # (usuarios/login)
             try:
                 datos, resp = llamar_api(
@@ -49,9 +59,14 @@ def crear_app():
                     )
                 else:
                     raise e
+=======
+            datos, resp = llamar_api(
+                "POST", "/usuarios/login", json={"email": email, "password": password}
+            )
+>>>>>>> feature/butacas_rutas
         except HTTPException as e:
             flash(e.description)
-            return redirect(url_for("cartelera"))
+            return redirect(url_for("login"))
 
         datos = datos or {}
         usuario = datos.get("usuario", datos)
@@ -60,7 +75,7 @@ def crear_app():
         
         if not id_usuario:
             flash("Respuesta inesperada del backend.")
-            return redirect(url_for("cartelera"))
+            return redirect(url_for("login"))
 
         session["usuario_id"] = id_usuario
         session["email"] = usuario.get("email", email)
@@ -70,7 +85,7 @@ def crear_app():
         if session["rol"] == "administrador":
             return redirect(url_for("gestion"))
         return redirect(url_for("cartelera"))
-
+        
     @app.route("/logout")
     def logout():
         session.clear()
