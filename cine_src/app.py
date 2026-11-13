@@ -12,6 +12,7 @@ from routes.butacas import butacas_bp
 from routes.peliculas import peliculas_bp
 from routes.usuarios import usuarios_bp
 from routes.funciones import funciones_bp
+from routes.entradas import entradas_bp
 
 def crear_app():
     app = Flask(__name__)
