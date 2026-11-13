@@ -37,7 +37,7 @@ def crear_funcion_admin():
     datos = {
         "id_pelicula": request.form.get("id_pelicula", type=int),
         "id_sala": request.form.get("id_sala", type=int),
-        "fecha_hora": request.form.get("fecha_hora", ""),
+        "fecha_hora": request.form.get("fecha_hora", "").replace("T", " ") + ":00",
         "precio": request.form.get("precio", type=int)
     }
 
