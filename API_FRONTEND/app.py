@@ -5,6 +5,7 @@ from web.routes.site.butacas import butacas_bp
 from web.routes.site.funcion import funcion_bp
 from web.routes.site.funciones_admin import funciones_admin_bp
 from api_client import llamar_api, CODIGOS_ERROR
+from web.routes.site.funcion import leer_filtros, consultar_cartelera
 
 
 def mostrar_error(e):
@@ -77,9 +78,18 @@ def crear_app():
 
     @app.route("/cartelera")
     def cartelera():
-        datos, _ = llamar_api("GET", "/peliculas", con_sesion=False)
-        peliculas = (datos or {}).get("peliculas", [])
-        return render_template("cartelera.html", active_page="cartelera", peliculas=peliculas)
+        filtros = leer_filtros()
+        peliculas = consultar_cartelera(filtros)
+        locales, _ = llamar_api("GET", "/locales", con_sesion=False)
+
+        return render_template(
+            "cartelera.html",
+            active_page="cartelera",
+            peliculas=peliculas or [],
+            locales=locales or [],
+            filtros=filtros,
+            requiere_login=peliculas is None,
+        )
     
     app.register_blueprint(butacas_bp)
     app.register_blueprint(funcion_bp)
