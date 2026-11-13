@@ -84,10 +84,10 @@ def marcar_usada(id_entrada: int) -> bool:
     return filas > 0
 
 def obtener_usuario(id_usuario: int):
-    return consultar_uno('SELECT id_usuarios AS id, nombre, email FROM usuarios WHERE id_usuarios = %s', (id_usuario,))
+    return consultar_uno('SELECT id, nombre, email FROM usuarios WHERE id = %s', (id_usuario,))
 
 def obtener_factura(id_reserva: int):
-    reserva = consultar_uno('SELECT r.id AS id_reserva, u.nombre, u.email FROM reservas r JOIN usuarios u ON u.id_usuarios = r.id_usuario WHERE r.id = %s', (id_reserva,))
+    reserva = consultar_uno('SELECT r.id AS id_reserva, u.nombre, u.email FROM reservas r JOIN usuarios u ON u.id = r.id_usuario WHERE r.id = %s', (id_reserva,))
     if reserva is None:
         return None
     entradas = consultar_todos('SELECT e.id, e.id_funcion, f.fecha_hora AS fecha_hora_funcion, e.id_butaca, e.precio, e.estado FROM entradas e JOIN funciones f ON f.id = e.id_funcion WHERE e.id_reserva = %s ORDER BY e.id', (id_reserva,))
@@ -107,7 +107,7 @@ def _condiciones_periodo(periodo: dict) -> tuple:
 
 _AGRUPACIONES = {
     'funcion': ('e.id_funcion, f.fecha_hora AS fecha_hora_funcion', '', 'e.id_funcion, f.fecha_hora'),
-    'pelicula': ('p.id AS id_pelicula, p.titulo', 'JOIN peliculas p ON p.id = f.id_pelicula ', 'p.id, p.titulo'),
+    'pelicula': ('p.id_pelicula, p.titulo', 'JOIN peliculas p ON p.id_pelicula = f.id_pelicula ', 'p.id_pelicula, p.titulo'),
 }
 
 def cancelaciones(agrupar: str, periodo: dict):

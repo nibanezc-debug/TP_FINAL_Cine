@@ -12,6 +12,7 @@ from routes.butacas import butacas_bp
 from routes.peliculas import peliculas_bp
 from routes.usuarios import usuarios_bp
 from routes.funciones import funciones_bp
+from routes.entradas import entradas_bp
 
 def crear_app():
     app = Flask(__name__)
@@ -26,6 +27,7 @@ def crear_app():
     app.register_blueprint(peliculas_bp, url_prefix='/api')
     app.register_blueprint(usuarios_bp, url_prefix='/api')
     app.register_blueprint(funciones_bp, url_prefix="/api")
+    app.register_blueprint(entradas_bp, url_prefix='/api')
 
     @app.errorhandler(ApiError)
     def manejar_error(error):
