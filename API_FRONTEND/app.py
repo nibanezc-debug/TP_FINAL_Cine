@@ -45,8 +45,6 @@ def crear_app():
         password = request.form.get("password", "")
 
         try:
-<<<<<<< HEAD
-            # (usuarios/login)
             try:
                 datos, resp = llamar_api(
                     "POST", "/usuarios/login", json={"email": email, "password": password}
@@ -59,11 +57,6 @@ def crear_app():
                     )
                 else:
                     raise e
-=======
-            datos, resp = llamar_api(
-                "POST", "/usuarios/login", json={"email": email, "password": password}
-            )
->>>>>>> feature/butacas_rutas
         except HTTPException as e:
             flash(e.description)
             return redirect(url_for("login"))
@@ -138,25 +131,6 @@ def crear_app():
 
     return app
 
-
-@app.route("/registro")
-def registro():
-    return render_template("registro.html", active_page="registro")
-
-
-@app.route("/login")
-def login():
-    return render_template("login.html", active_page="login")
-
-
-@app.route("/perfil")
-def perfil():
-    return render_template("perfil.html", usuario={}, active_page="perfil")
-
-
-@app.route("/usuarios")
-def listar_usuarios():
-    return render_template("usuarios.html", usuarios=[], active_page="usuarios")
 
 if __name__ == "__main__":
     app_front = crear_app()
