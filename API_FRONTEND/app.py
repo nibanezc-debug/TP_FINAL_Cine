@@ -29,25 +29,33 @@ def crear_app():
     def index():
         return redirect(url_for("cartelera"))
 
-    @app.route("/login", methods=["POST"])
+    @app.route("/login", methods=["GET", "POST"])
     def login():
+        if request.method == "GET":
+            return """
+            <form method="POST" action="/login">
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Entrar</button>
+            </form>
+            """
+
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
 
         try:
-            # SUPUESTO: la ruta es /api/usuarios/login. Confirmarlo en routes/usuarios.py
             datos, resp = llamar_api(
-                "POST", "/auth/login", json={"email": email, "password": password}
+                "POST", "/usuarios/login", json={"email": email, "password": password}
             )
         except HTTPException as e:
             flash(e.description)
-            return redirect(url_for("cartelera"))
+            return redirect(url_for("login"))
 
         datos = datos or {}
         usuario = datos.get("usuario", datos)
         if "id" not in usuario:
             flash("Respuesta inesperada del backend.")
-            return redirect(url_for("cartelera"))
+            return redirect(url_for("login"))
 
         session["usuario_id"] = usuario["id"]
         session["email"] = usuario.get("email", email)
@@ -57,7 +65,7 @@ def crear_app():
         if session["rol"] == "administrador":
             return redirect(url_for("gestion"))
         return redirect(url_for("cartelera"))
-
+        
     @app.route("/logout")
     def logout():
         session.clear()

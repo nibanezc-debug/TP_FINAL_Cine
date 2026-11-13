@@ -29,7 +29,7 @@
     </div>
   </div>
 
-  <!-- BLOQUE INFERIOR: Rectángulos de horarios + Botón abajo a la derecha -->
+
   <form method="POST" class="panel showtime-selector-panel">
     <span class="eyebrow">FUNCIONES DISPONIBLES</span>
     <h2>Elegí un horario</h2>
@@ -37,7 +37,7 @@
     <div class="showtime-cards">
       {% for f in funciones %}
         <label class="showtime-card">
-          <input type="radio" name="id_funcion" value="{{ f.id }}" required />
+          <input type="radio" name="id_funcion" value="{{ f.id_funcion or f.id }}" required />
           <strong class="showtime-hour">{{ f.fecha_hora }}</strong>
           <span class="muted small">{{ f.sala | default('Sala') }} · ${{ f.precio }}</span>
         </label>
@@ -47,8 +47,8 @@
     </div>
 
     <div class="bottom-right-action">
-      <button type="submit" class="button" id="btnElegirButacas" disabled>
-        Elegir butacas →
+      <button type="submit" id="btnElegirButacas" class="button" disabled>
+        COMPRAR · Elegir butacas →
       </button>
     </div>
   </form>

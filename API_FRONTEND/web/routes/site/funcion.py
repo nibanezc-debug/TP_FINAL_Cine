@@ -9,7 +9,7 @@ def get_funciones(id_pelicula):
     if request.method == "POST":
         id_funcion = request.form.get("id_funcion")
         if id_funcion and id_funcion.isdigit():
-            return redirect(url_for("butacas.vista_butacas", id_funcion=int(id_funcion)))
+            return redirect(url_for("butacas.vista_butacas", id=int(id_funcion)))
 
     funciones, _ = llamar_api(
         "GET",

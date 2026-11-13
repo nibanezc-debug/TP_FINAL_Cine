@@ -491,6 +491,13 @@ button {
   overflow-x: auto;
 }
 
+.seat-map {
+  display: grid;
+  gap: 6px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
 .seat-map-120 {
   grid-template-columns: repeat(12, 30px);
 }

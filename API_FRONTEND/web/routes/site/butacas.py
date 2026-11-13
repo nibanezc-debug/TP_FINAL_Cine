@@ -10,7 +10,7 @@ TEMPLATES_POR_CAPACIDAD = {
 }
 
 
-@butacas_bp.route("/cartelera/peliculas/<int:id_pelicula>/funcion/<int:id_funcion>/butacas", methods=["GET"])
+@butacas_bp.route("/cartelera/funcion/<int:id>/butacas", methods=["GET"])
 def vista_butacas(id):
     # llamar_api devuelve la tupla (datos, resp); si hay error en el backend hace abort() solo
     butacas, _ = llamar_api("GET", f"/funciones/{id}/butacas", con_sesion=False)
@@ -19,7 +19,7 @@ def vista_butacas(id):
     butacas = butacas or []
     funcion = funcion or {}
 
-    template_elegido = TEMPLATES_POR_CAPACIDAD.get(len(butacas), "butacas_120.html")
+    template_elegido = TEMPLATES_POR_CAPACIDAD.get(len(butacas))
 
     return render_template(
         template_elegido,
