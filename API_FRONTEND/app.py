@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.exceptions import HTTPException
 from web.routes.site.butacas import butacas_bp
 from web.routes.site.funcion import funcion_bp
-
+from web.routes.site.funciones_admin import funciones_admin_bp
 from api_client import llamar_api, CODIGOS_ERROR
 
 
@@ -83,6 +83,7 @@ def crear_app():
     
     app.register_blueprint(butacas_bp)
     app.register_blueprint(funcion_bp)
+    app.register_blueprint(funciones_admin_bp)
 
     @app.route("/checkout")
     def checkout():
