@@ -10,23 +10,25 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="{{ url_for('cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
+      <!-- CORREGIDO: vistas.cartelera -->
+      <a class="brand" href="{{ url_for('vistas.cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
         <span class="brand-mark">CP</span><span>CINE <b>PARADISO</b></span>
       </a>
 
       <nav class="main-nav" aria-label="Navegación principal">
-        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('cartelera') }}">Cartelera</a>
-        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout') }}">Checkout</a>
-        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante') }}">Comprobante</a>
+        <!-- CORREGIDOS: vistas.cartelera, vistas.checkout, vistas.comprobante, etc. -->
+        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('vistas.cartelera') }}">Cartelera</a>
+        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('vistas.checkout') }}">Checkout</a>
+        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('vistas.comprobante') }}">Comprobante</a>
 
         {% if session.get('usuario_id') %}
-          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
+          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('vistas.entradas') }}">Mis entradas</a>
         {% endif %}
 
         {% if session.get('rol') == 'administrador' %}
           <span class="nav-separator"></span>
-          <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('gestion') }}">Staff / Admin</a>
-          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('vistas.gestion') }}">Staff / Admin</a>
+          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('vistas.dashboard') }}">Dashboard</a>
         {% endif %}
       </nav>
 
@@ -38,6 +40,7 @@
             <small>{{ session.get('rol') | capitalize }}</small>
           </span>
         </div>
+        <!-- Mantiene 'logout' porque está en app.py -->
         <a class="button button-small button-ghost" href="{{ url_for('logout') }}">Cerrar sesión</a>
       {% else %}
         <button class="button button-small button-ghost" id="loginBtn" type="button" onclick="document.getElementById('loginModal').showModal()">
@@ -71,6 +74,7 @@
       <h2>Iniciar sesión</h2>
       <button class="icon-button" type="button" onclick="document.getElementById('loginModal').close()" aria-label="Cerrar">✕</button>
     </div>
+    <!-- Mantiene 'login' porque está en app.py -->
     <form action="{{ url_for('login') }}" method="post">
       <div class="field">
         <span>EMAIL</span>
