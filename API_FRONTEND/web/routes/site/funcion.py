@@ -49,25 +49,43 @@ def consultar_cartelera(filtros):
 
 @funcion_bp.route("/cartelera/peliculas/<int:id_pelicula>", methods=["GET", "POST"])
 def get_funciones(id_pelicula):
-    if request.method == "POST":
-        id_funcion = request.form.get("id_funcion")
-        if id_funcion and id_funcion.isdigit():
-            return redirect(url_for("butacas.vista_butacas", id_funcion=int(id_funcion)))
+    filtros = leer_filtros()
 
-    funciones, _ = llamar_api(
-        "GET",
-        f"/funciones?id_pelicula={id_pelicula}",
-        con_sesion=False
-    )
-    pelicula, _ = llamar_api(
-        "GET",
-        f"/peliculas/{id_pelicula}",
-        con_sesion=False,
-    )
+    if request.method == "POST":
+        id_funcion = request.form.get("id_funcion", "")
+        if id_funcion.isdigit():
+            return redirect(url_for("butacas.vista_butacas", id_funcion=int(id_funcion)))
+        flash("Elegí una función para continuar.")
+        return redirect(url_for("funcion.get_funciones", id_pelicula=id_pelicula, **filtros))
+
+    peliculas = consultar_cartelera(filtros)
+    if peliculas is None:
+        flash("Iniciá sesión para ver los horarios.")
+        return redirect(url_for("cartelera", **filtros))
+
+    # La cartelera solo trae funciones futuras de películas activas.
+    pelicula = None
+    for p in peliculas:
+        if p["id_pelicula"] == id_pelicula:
+            pelicula = p
+
+    if pelicula is None:
+        # Sin funciones con estos filtros: igual se muestran los datos de la película.
+        pelicula, _ = llamar_api("GET", f"/peliculas/{id_pelicula}")
+        pelicula["funciones"] = []
+
+    # GET /api/funciones también trae funciones pasadas, por eso se dejan
+    # solo las que la cartelera ofrece.
+    funciones = []
+    if pelicula["funciones"]:
+        listado, _ = llamar_api("GET", "/funciones", params=dict(filtros, id_pelicula=id_pelicula))
+        ofrecidas = [f["id"] for f in pelicula["funciones"]]
+        funciones = [f for f in listado if f["id"] in ofrecidas]
 
     return render_template(
         "detalle_pelicula.html",
-        pelicula=pelicula or {},
-        funciones=funciones or [],
+        pelicula=pelicula,
+        funciones=funciones,
+        filtros=filtros,
         active_page="cartelera",
     )
