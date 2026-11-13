@@ -49,7 +49,7 @@
       <span><i class="legend-seat chosen"></i> Seleccionada</span>
     </div>
 
-    <form method="POST" action="{{ url_for('butacas.seleccionar_butacas', id=funcion.id) }}" class="seat-footer">
+    <form method="POST" action="{{ url_for('butacas.seleccionar_butacas', id_funcion=funcion.id) }}" class="seat-footer">
       <div>
         <span class="eyebrow">SELECCIONÁ HASTA 8 BUTACAS</span>
         <strong id="selectedSeatsText">Ninguna seleccionada</strong>
