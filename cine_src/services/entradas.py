@@ -65,6 +65,26 @@ def factura(id_entrada: int, usuario: dict):
     total_servicios = sum(s['subtotal'] for s in datos['servicios'])
     return {**datos, 'total_entradas': total_entradas, 'total_servicios': total_servicios, 'total': total_entradas + total_servicios}
 
+def pagar(id_entrada: int, usuario: dict):
+    entrada = _obtener_autorizado(id_entrada, usuario)
+    if entrada['estado'] != 'activa':
+        raise ApiError('La entrada ya no está activa', 409)
+    reserva = repositorio.obtener_reserva(entrada['id_reserva'])
+    if reserva is None:
+        raise ApiError('La reserva de la entrada no existe', 404)
+    if reserva['estado'] != 'pendiente':
+        raise ApiError('La reserva ya fue pagada o cancelada', 409)
+    destinatario = repositorio.obtener_usuario(entrada['id_usuario'])
+    if destinatario is None:
+        raise ApiError('El usuario de la entrada no existe', 404)
+    datos_factura = repositorio.obtener_factura(entrada['id_reserva'])
+    entradas = repositorio.entradas_de_reserva(entrada['id_reserva'])
+    adjuntos_qr = [(e['id'], _png_qr(e['codigo_qr'])) for e in entradas if e['estado'] == 'activa']
+    correo.enviar_compra(destinatario, datos_factura, adjuntos_qr)
+    if not repositorio.pagar_reserva(entrada['id_reserva']):
+        raise ApiError('La reserva ya fue pagada o cancelada', 409)
+    return {'pagada': True, 'id_reserva': entrada['id_reserva'], 'enviado': True, 'destinatario': destinatario['email']}
+
 def reenviar(id_entrada: int, usuario: dict):
     entrada = _obtener_activa(id_entrada, usuario)
     destinatario = repositorio.obtener_usuario(entrada['id_usuario'])
@@ -103,6 +123,12 @@ def validar(datos):
 def estadisticas_cancelaciones(argumentos):
     filas = repositorio.cancelaciones(validar_agrupacion(argumentos), validar_periodo(argumentos))
     return [{**fila, 'porcentaje': round(fila['cancelaciones'] * 100 / fila['entradas'], 1)} for fila in filas]
+
+def estadisticas_ocupacion(argumentos):
+    return repositorio.ocupacion(validar_agrupacion(argumentos), validar_periodo(argumentos))
+
+def estadisticas_ventas_genero(argumentos):
+    return repositorio.ventas_por_genero(validar_periodo(argumentos))
 
 def estadisticas_franjas(argumentos):
     filas = repositorio.franjas_horarias(validar_periodo(argumentos))
