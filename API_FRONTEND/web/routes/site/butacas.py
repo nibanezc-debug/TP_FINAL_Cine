@@ -10,11 +10,11 @@ TEMPLATES_POR_CAPACIDAD = {
 }
 
 
-@butacas_bp.route("/cartelera/peliculas/<int:id_pelicula>/funcion/<int:id_funcion>/butacas", methods=["GET"])
-def vista_butacas(id):
+@butacas_bp.route("/funcion/<int:id_funcion>/butacas", methods=["GET"])
+def vista_butacas(id_funcion):
     # llamar_api devuelve la tupla (datos, resp); si hay error en el backend hace abort() solo
-    butacas, _ = llamar_api("GET", f"/funciones/{id}/butacas", con_sesion=False)
-    funcion, _ = llamar_api("GET", f"/funciones/{id}", con_sesion=False)
+    butacas, _ = llamar_api("GET", f"/funciones/{id_funcion}/butacas", con_sesion=False)
+    funcion, _ = llamar_api("GET", f"/funciones/{id_funcion}")
 
     butacas = butacas or []
     funcion = funcion or {}
@@ -29,7 +29,7 @@ def vista_butacas(id):
     )
 
 
-@butacas_bp.route("/funcion/<int:id>/butacas", methods=["POST"])
+@butacas_bp.route("/funcion/<int:id_funcion>/butacas", methods=["POST"])
 def seleccionar_butacas(id_funcion):
     ids_raw = request.form.get("butacas_ids", "")
     labels = request.form.get("butacas_labels", "")
