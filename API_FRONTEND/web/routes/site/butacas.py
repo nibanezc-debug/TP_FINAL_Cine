@@ -13,8 +13,8 @@ TEMPLATES_POR_CAPACIDAD = {
 @butacas_bp.route("/cartelera/funcion/<int:id>/butacas", methods=["GET"])
 def vista_butacas(id):
     # llamar_api devuelve la tupla (datos, resp); si hay error en el backend hace abort() solo
-    butacas, _ = llamar_api("GET", f"/funciones/{id_funcion}/butacas", con_sesion=False)
-    funcion, _ = llamar_api("GET", f"/funciones/{id_funcion}")
+    butacas, _ = llamar_api("GET", f"/funciones/{id}/butacas", con_sesion=False)
+    funcion, _ = llamar_api("GET", f"/funciones/{id}")
 
     butacas = butacas or []
     funcion = funcion or {}
@@ -36,7 +36,7 @@ def seleccionar_butacas(id_funcion):
 
     butacas_ids = [int(x) for x in ids_raw.split(",") if x.isdigit()]
     if not butacas_ids:
-        return redirect(url_for("butacas.vista_butacas", id_funcion=id_funcion))
+        return redirect(url_for("butacas.vista_butacas", id=id_funcion))
 
     session["carrito"] = {
         "id_funcion": id_funcion,

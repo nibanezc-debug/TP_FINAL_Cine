@@ -1,14 +1,10 @@
 from datetime import datetime
-
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from werkzeug.exceptions import HTTPException
-
 from api_client import llamar_api
 
 funcion_bp = Blueprint("funcion", __name__)
 
-
-# Lee los filtros de la URL. Los inválidos no se mandan al backend.
 def leer_filtros():
     filtros = {}
     id_local = request.args.get("id_local", "")
@@ -29,19 +25,15 @@ def leer_filtros():
 
     return filtros
 
-
-# GET /api/cartelera requiere sesión. Devuelve None si hay que iniciar sesión.
+# Cualquier usuario, logueado o no, puede ver la cartelera
 def consultar_cartelera(filtros):
-    if not session.get("usuario_id"):
-        return None
-
     try:
-        peliculas, _ = llamar_api("GET", "/cartelera", params=filtros)
+        # con_sesion=False asegura que no exija estar logueado
+        peliculas, _ = llamar_api("GET", "/cartelera", params=filtros, con_sesion=False)
     except HTTPException as error:
+        # Si el backend sigue exigiendo sesión por error de otro compañero, atajamos la caída
         if error.code == 401:
-            # la sesión del backend venció
-            session.clear()
-            return None
+            return []
         raise
 
     return peliculas or []
@@ -49,41 +41,45 @@ def consultar_cartelera(filtros):
 
 @funcion_bp.route("/cartelera/peliculas/<int:id_pelicula>", methods=["GET", "POST"])
 def get_funciones(id_pelicula):
-    if request.method == "POST":
-        id_funcion = request.form.get("id_funcion")
-        if id_funcion and id_funcion.isdigit():
-            return redirect(url_for("butacas.vista_butacas", id=int(id_funcion)))
-
+    filtros = leer_filtros() 
+    
     if request.method == "POST":
         id_funcion = request.form.get("id_funcion", "")
         if id_funcion.isdigit():
-            return redirect(url_for("butacas.vista_butacas", id_funcion=int(id_funcion)))
+            # Acá el usuario eligió horario. Si no está logueado, podríamos frenarlo acá
+            if not session.get("usuario_id"):
+                flash("Por favor, iniciá sesión para comprar butacas.")
+                return redirect(url_for("vistas.cartelera"))
+            
+            return redirect(url_for("butacas.vista_butacas", id=int(id_funcion)))
+            
         flash("Elegí una función para continuar.")
         return redirect(url_for("funcion.get_funciones", id_pelicula=id_pelicula, **filtros))
 
     peliculas = consultar_cartelera(filtros)
-    if peliculas is None:
-        flash("Iniciá sesión para ver los horarios.")
-        return redirect(url_for("cartelera", **filtros))
 
-    # La cartelera solo trae funciones futuras de películas activas.
     pelicula = None
     for p in peliculas:
         if p["id_pelicula"] == id_pelicula:
             pelicula = p
 
     if pelicula is None:
-        # Sin funciones con estos filtros: igual se muestran los datos de la película.
-        pelicula, _ = llamar_api("GET", f"/peliculas/{id_pelicula}")
-        pelicula["funciones"] = []
+        try:
+            # con_sesion=False para que el invitado pueda ver la info de la peli
+            pelicula, _ = llamar_api("GET", f"/peliculas/{id_pelicula}", con_sesion=False)
+            pelicula["funciones"] = []
+        except HTTPException:
+            flash("No se pudo encontrar la película.")
+            return redirect(url_for("vistas.cartelera", **filtros))
 
-    # GET /api/funciones también trae funciones pasadas, por eso se dejan
-    # solo las que la cartelera ofrece.
     funciones = []
-    if pelicula["funciones"]:
-        listado, _ = llamar_api("GET", "/funciones", params=dict(filtros, id_pelicula=id_pelicula))
-        ofrecidas = [f["id"] for f in pelicula["funciones"]]
-        funciones = [f for f in listado if f["id"] in ofrecidas]
+    if pelicula.get("funciones"):
+        try:
+            listado, _ = llamar_api("GET", "/funciones", params=dict(filtros, id_pelicula=id_pelicula), con_sesion=False)
+            ofrecidas = [f["id"] for f in pelicula["funciones"]]
+            funciones = [f for f in listado if f["id"] in ofrecidas]
+        except Exception:
+            pass
 
     return render_template(
         "detalle_pelicula.html",

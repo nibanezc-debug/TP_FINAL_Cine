@@ -10,7 +10,7 @@
     <p class="muted">Encontrá tu próxima película y reservá tus butacas en pocos pasos.</p>
   </div>
 
-  <form class="filter-panel filter-form" method="get" action="{{ url_for('cartelera') }}">
+  <form class="filter-panel filter-form" method="get" action="{{ url_for('vistas.cartelera') }}">
     <label class="field">
       <span>CINE</span>
       <select name="id_local">
@@ -27,52 +27,42 @@
     <button class="button" type="submit">Filtrar</button>
   </form>
 
-  {% if requiere_login %}
-    <div class="panel">
-      <h2>Iniciá sesión para ver funciones y horarios</h2>
-      <p class="muted">La cartelera con horarios está disponible para usuarios registrados.</p>
-      <button class="button" type="button" onclick="document.getElementById('loginModal').showModal()">Iniciar sesión</button>
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">FUNCIONES PRÓXIMAS</span>
+      <h2>En cartelera</h2>
     </div>
-  {% else %}
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow">FUNCIONES PRÓXIMAS</span>
-        <h2>En cartelera</h2>
-      </div>
-      <span class="muted small">{{ peliculas | length }} películas</span>
-    </div>
+    <span class="muted small">{{ peliculas | length }} películas</span>
+  </div>
 
-    {# Sin id="movieGrid": el JS de demostración lo reemplazaría con datos falsos #}
-    <div class="movie-grid">
-      {% for p in peliculas %}
-      <article class="movie-card">
-        <div class="poster">
-          {% if p.poster_url %}
-          <img src="{{ p.poster_url }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2">
-          {% endif %}
-          <span>{{ p.titulo | upper }}</span>
-        </div>
-        <div class="movie-card-body">
-          <h3>{{ p.titulo }}</h3>
-          <div class="movie-meta">{{ p.clasificacion }} · {{ p.duracion_minutos }} min</div>
-          <p class="muted small">{{ p.sinopsis | truncate(100) }}</p>
-          <p>
-            {% for f in p.funciones[:3] %}
-              {# fecha_hora llega como "2026-11-14T20:30:00" #}
-              <span class="pill">{{ f.fecha_hora[8:10] }}/{{ f.fecha_hora[5:7] }} {{ f.fecha_hora[11:16] }}</span>
-            {% endfor %}
-          </p>
-          <a class="button" href="{{ url_for('funcion.get_funciones', id_pelicula=p.id_pelicula, **filtros) }}">VER HORARIOS</a>
-        </div>
-      </article>
-      {% else %}
-        {% if filtros %}
-          <p class="muted">No hay funciones para los filtros elegidos. <a href="{{ url_for('cartelera') }}">Ver toda la cartelera</a></p>
-        {% else %}
-          <p class="muted">No hay películas en cartelera.</p>
+  <div class="movie-grid">
+    {% for p in peliculas %}
+    <article class="movie-card">
+      <div class="poster">
+        {% if p.poster_url %}
+        <img src="{{ p.poster_url }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2">
         {% endif %}
-      {% endfor %}
-    </div>
-  {% endif %}
+        <span>{{ p.titulo | upper }}</span>
+      </div>
+      <div class="movie-card-body">
+        <h3>{{ p.titulo }}</h3>
+        <div class="movie-meta">{{ p.clasificacion }} · {{ p.duracion_minutos }} min</div>
+        <p class="muted small">{{ p.sinopsis | truncate(100) }}</p>
+        <p>
+          {% for f in p.funciones[:3] %}
+            <span class="pill">{{ f.fecha_hora[8:10] }}/{{ f.fecha_hora[5:7] }} {{ f.fecha_hora[11:16] }}</span>
+          {% endfor %}
+        </p>
+        <a class="button" href="{{ url_for('funcion.get_funciones', id_pelicula=p.id_pelicula, **filtros) }}">VER HORARIOS</a>
+      </div>
+    </article>
+    {% else %}
+      {% if filtros %}
+        <p class="muted">No hay funciones para los filtros elegidos. <a href="{{ url_for('vistas.cartelera') }}">Ver toda la cartelera</a></p>
+      {% else %}
+        <p class="muted">No hay películas en cartelera.</p>
+      {% endif %}
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}

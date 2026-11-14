@@ -10,26 +10,25 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="{{ url_for('cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
+      <a class="brand" href="{{ url_for('vistas.cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
         <span class="brand-mark">CP</span><span>CINE <b>PARADISO</b></span>
       </a>
 
       <nav class="main-nav" aria-label="Navegación principal">
-        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('cartelera') }}">Cartelera</a>
-        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout') }}">Checkout</a>
-        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante') }}">Comprobante</a>
+        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('vistas.cartelera') }}">Cartelera</a>
+        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('vistas.checkout') }}">Checkout</a>
+        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('vistas.comprobante') }}">Comprobante</a>
 
         {% if session.get('usuario_id') %}
-          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
+          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('vistas.entradas') }}">Mis entradas</a>
         {% endif %}
 
         {% if session.get('rol') == 'administrador' %}
           <span class="nav-separator"></span>
-          <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('gestion') }}">Staff / Admin</a>
-        
+          <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('vistas.gestion') }}">Staff / Admin</a>
           <a class="nav-link" href="{{ url_for('funciones_admin.listar_funciones_admin') }}">Funciones</a>
-        
-          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a class="nav-link {% if active_page == 'usuarios' %}active{% endif %}" href="{{ url_for('usuarios_admin.listar_usuarios') }}">Usuarios</a>
+          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('vistas.dashboard') }}">Dashboard</a>
         {% endif %}
       </nav>
 
@@ -41,7 +40,7 @@
             <small>{{ session.get('rol') | capitalize }}</small>
           </span>
         </div>
-        <a class="button button-small button-ghost" href="{{ url_for('logout') }}">Cerrar sesión</a>
+        <a class="button button-small button-ghost" href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
       {% else %}
         <button class="button button-small button-ghost" id="loginBtn" type="button" onclick="document.getElementById('loginModal').showModal()">
           Iniciar sesión
@@ -67,14 +66,14 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
 
-  <!-- Modal de Login con formulario POST tradicional hacia el servidor Flask -->
+  <!-- Modal de Login -->
   {% if not session.get('usuario_id') %}
   <dialog class="modal" id="loginModal">
     <div class="modal-head">
       <h2>Iniciar sesión</h2>
       <button class="icon-button" type="button" onclick="document.getElementById('loginModal').close()" aria-label="Cerrar">✕</button>
     </div>
-    <form action="{{ url_for('login') }}" method="post">
+    <form action="{{ url_for('auth.login') }}" method="post">
       <div class="field">
         <span>EMAIL</span>
         <input type="email" id="email" name="email" placeholder="admin@cineparadiso.com" required />

@@ -7,7 +7,6 @@ funciones_bp = Blueprint("funciones", __name__)
 
 
 @funciones_bp.get("/cartelera")
-@requiere_usuario
 def listar_cartelera():
     return jsonify(servicio.listar_cartelera(request.args)), 200
 
