@@ -1,0 +1,55 @@
+/* Estilos de cartelera (filtros) y selección de horarios.
+   Solo agrega reglas para clases que no tenían estilo en styles.css. */
+
+.filter-form {
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+}
+
+.movie-hero {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  margin-bottom: 25px;
+}
+
+.movie-poster-box img {
+  width: 100%;
+  border-radius: 9px;
+}
+
+.showtime-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin: 17px 0;
+}
+
+.showtime-card {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  border: 1px solid #333;
+  border-radius: 9px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.showtime-card:has(input:checked) {
+  border-color: var(--red);
+}
+
+.showtime-hour {
+  font-size: 22px;
+}
+
+.bottom-right-action {
+  display: flex;
+  justify-content: end;
+}
+
+@media (max-width: 700px) {
+  .filter-form { grid-template-columns: 1fr; }
+  .movie-hero { grid-template-columns: 1fr; }
+  .showtime-cards { grid-template-columns: 1fr 1fr; }
+}

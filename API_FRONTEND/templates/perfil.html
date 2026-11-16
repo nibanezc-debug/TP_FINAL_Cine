@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-perfil">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('cartelera') }}">← Volver a cartelera</a>
+      <span class="eyebrow">CUENTA PERSONAL</span>
+      <h1>Mi perfil</h1>
+      <p class="muted">Consultá y actualizá tus datos personales.</p>
+    </div>
+    <span class="pill">{{ usuario.rol | upper }}</span>
+  </div>
+
+  <div class="panel" style="max-width: 520px; margin: 0 auto;">
+    <form method="POST" action="{{ url_for('perfil') }}" style="display: grid; gap: 1rem;">
+      <label class="field">
+        <span>NOMBRE</span>
+        <input type="text" name="nombre" value="{{ usuario.nombre }}" required />
+      </label>
+
+      <label class="field">
+        <span>CORREO ELECTRÓNICO</span>
+        <input type="email" name="email" value="{{ usuario.email }}" required />
+      </label>
+
+      {% if usuario.fecha_registro %}
+      <p class="muted small">Miembro desde: {{ usuario.fecha_registro }}</p>
+      {% endif %}
+
+      <div style="display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+        <button type="submit" class="button">Guardar cambios</button>
+        <a class="button button-ghost" href="{{ url_for('logout') }}">Cerrar sesión</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

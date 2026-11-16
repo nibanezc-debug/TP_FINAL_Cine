@@ -1,0 +1,105 @@
+
+{% extends "base.html" %}
+{% block title %}Gestión de Funciones{% endblock %}
+
+{% block content %}
+<section class="view active">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">BACKOFFICE</span>
+      <h1>Gestión de funciones</h1>
+      <p class="muted">
+        Administrá los horarios del cine.
+      </p>
+    </div>
+  </div>
+
+  {% for mensaje in get_flashed_messages() %}
+    <div class="panel">{{ mensaje }}</div>
+  {% endfor %}
+
+  <div class="panel">
+    <h2>Crear nueva función</h2>
+
+    <form method="post"
+          action="{{ url_for('funciones_admin.crear_funcion_admin') }}">
+
+      <label class="field">
+        ID de película
+        <input type="number" name="id_pelicula"
+               min="1" required>
+      </label>
+
+      <label class="field">
+        ID de sala
+        <input type="number" name="id_sala"
+               min="1" required>
+      </label>
+
+      <label class="field">
+        Fecha y horario
+        <input type="datetime-local"
+               name="fecha_hora" required>
+      </label>
+
+      <label class="field">
+        Precio
+        <input type="number" name="precio"
+               min="1" step="1" required>
+      </label>
+
+      <button type="submit" class="button">
+        Crear función
+      </button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Funciones registradas</h2>
+
+    {% for funcion in funciones %}
+      <div class="panel">
+        <h3>{{ funcion.titulo }}</h3>
+
+        <p>Sala: {{ funcion.sala }}</p>
+        <p>Fecha: {{ funcion.fecha_hora }}</p>
+        <p>Precio: ${{ funcion.precio }}</p>
+
+        <form method="post"
+          action="{{ url_for(
+            'funciones_admin.editar_funcion_admin',
+            id_funcion=funcion.id
+          ) }}">
+
+          <label class="field">
+            Nuevo precio
+            <input type="number" name="precio"
+                   min="1" step="1"
+                   value="{{ funcion.precio }}">
+          </label>
+
+          <button type="submit"
+                  class="button button-ghost">
+            Guardar cambios
+          </button>
+        </form>
+
+        <form method="post"
+          action="{{ url_for(
+            'funciones_admin.eliminar_funcion_admin',
+            id_funcion=funcion.id
+          ) }}"
+          onsubmit="return confirm('¿Eliminar esta función?')">
+
+          <button type="submit"
+                  class="button button-ghost">
+            Eliminar función
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <p>No hay funciones registradas.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

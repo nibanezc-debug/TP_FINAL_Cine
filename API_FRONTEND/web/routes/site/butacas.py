@@ -10,16 +10,16 @@ TEMPLATES_POR_CAPACIDAD = {
 }
 
 
-@butacas_bp.route("/cartelera/peliculas/<int:id_pelicula>/funcion/<int:id_funcion>/butacas", methods=["GET"])
+@butacas_bp.route("/cartelera/funcion/<int:id>/butacas", methods=["GET"])
 def vista_butacas(id):
     # llamar_api devuelve la tupla (datos, resp); si hay error en el backend hace abort() solo
     butacas, _ = llamar_api("GET", f"/funciones/{id}/butacas", con_sesion=False)
-    funcion, _ = llamar_api("GET", f"/funciones/{id}", con_sesion=False)
+    funcion, _ = llamar_api("GET", f"/funciones/{id}")
 
     butacas = butacas or []
     funcion = funcion or {}
 
-    template_elegido = TEMPLATES_POR_CAPACIDAD.get(len(butacas), "butacas_120.html")
+    template_elegido = TEMPLATES_POR_CAPACIDAD.get(len(butacas))
 
     return render_template(
         template_elegido,
@@ -29,14 +29,14 @@ def vista_butacas(id):
     )
 
 
-@butacas_bp.route("/funcion/<int:id>/butacas", methods=["POST"])
+@butacas_bp.route("/funcion/<int:id_funcion>/butacas", methods=["POST"])
 def seleccionar_butacas(id_funcion):
     ids_raw = request.form.get("butacas_ids", "")
     labels = request.form.get("butacas_labels", "")
 
     butacas_ids = [int(x) for x in ids_raw.split(",") if x.isdigit()]
     if not butacas_ids:
-        return redirect(url_for("butacas.vista_butacas", id_funcion=id_funcion))
+        return redirect(url_for("butacas.vista_butacas", id=id_funcion))
 
     session["carrito"] = {
         "id_funcion": id_funcion,
