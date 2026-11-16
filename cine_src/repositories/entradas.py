@@ -94,6 +94,18 @@ def obtener_factura(id_reserva: int):
     servicios = consultar_todos('SELECT c.id, s.nombre, c.cantidad, c.precio_unitario, c.subtotal FROM consumos c JOIN servicios s ON s.id = c.id_servicio WHERE c.id_reserva = %s ORDER BY c.id', (id_reserva,))
     return {'reserva': reserva, 'entradas': [_serializar(e) for e in entradas], 'servicios': servicios}
 
+def obtener_reserva(id_reserva: int):
+    fila = consultar_uno('SELECT id, id_usuario, estado, fecha_reserva FROM reservas WHERE id = %s', (id_reserva,))
+    return _serializar(fila)
+
+def pagar_reserva(id_reserva: int) -> bool:
+    _, filas = ejecutar("UPDATE reservas SET estado = 'pagada' WHERE id = %s AND estado = 'pendiente'", (id_reserva,))
+    return filas > 0
+
+def entradas_de_reserva(id_reserva: int):
+    filas = consultar_todos(_SELECT_ENTRADA + 'WHERE e.id_reserva = %s ORDER BY e.id', (id_reserva,))
+    return [_serializar(fila) for fila in filas]
+
 def _condiciones_periodo(periodo: dict) -> tuple:
     condiciones = []
     parametros = []
@@ -124,4 +136,31 @@ def franjas_horarias(periodo: dict):
     sql = ('SELECT HOUR(f.fecha_hora) AS hora, COUNT(*) AS entradas, CAST(SUM(e.precio) AS UNSIGNED) AS recaudado '
            f'FROM entradas e JOIN funciones f ON f.id = e.id_funcion {_donde(condiciones)}'
            'GROUP BY HOUR(f.fecha_hora) ORDER BY entradas DESC, hora')
+    return consultar_todos(sql, tuple(parametros))
+
+def ocupacion(agrupar: str, periodo: dict):
+    condiciones, parametros = _condiciones_periodo(periodo)
+    if agrupar == 'funcion':
+        sql = ('SELECT f.id AS id_funcion, f.fecha_hora AS fecha_hora_funcion, p.titulo, s.capacidad, '
+               "COUNT(CASE WHEN e.estado <> 'cancelada' THEN 1 END) AS vendidas, "
+               "ROUND(COUNT(CASE WHEN e.estado <> 'cancelada' THEN 1 END) * 100 / s.capacidad, 1) AS ocupacion "
+               'FROM funciones f JOIN salas s ON s.id = f.id_sala JOIN peliculas p ON p.id_pelicula = f.id_pelicula '
+               'LEFT JOIN entradas e ON e.id_funcion = f.id '
+               f"{_donde(condiciones)}GROUP BY f.id, f.fecha_hora, p.titulo, s.capacidad ORDER BY ocupacion DESC")
+    else:
+        sql = ('SELECT p.id_pelicula, p.titulo, '
+               "COUNT(CASE WHEN e.estado <> 'cancelada' THEN 1 END) AS vendidas, SUM(s.capacidad) AS capacidad_total, "
+               "ROUND(COUNT(CASE WHEN e.estado <> 'cancelada' THEN 1 END) * 100 / SUM(s.capacidad), 1) AS ocupacion "
+               'FROM peliculas p JOIN funciones f ON f.id_pelicula = p.id_pelicula JOIN salas s ON s.id = f.id_sala '
+               'LEFT JOIN entradas e ON e.id_funcion = f.id '
+               f"{_donde(condiciones)}GROUP BY p.id_pelicula, p.titulo "
+               "HAVING COUNT(CASE WHEN e.estado <> 'cancelada' THEN 1 END) > 0 ORDER BY ocupacion DESC")
+    return [_serializar(fila) for fila in consultar_todos(sql, tuple(parametros))]
+
+def ventas_por_genero(periodo: dict):
+    condiciones, parametros = _condiciones_periodo(periodo)
+    condiciones.append("e.estado <> 'cancelada'")
+    sql = ('SELECT p.genero, COUNT(*) AS entradas, CAST(SUM(e.precio) AS UNSIGNED) AS recaudado '
+           'FROM entradas e JOIN funciones f ON f.id = e.id_funcion JOIN peliculas p ON p.id_pelicula = f.id_pelicula '
+           f"{_donde(condiciones)}GROUP BY p.genero ORDER BY recaudado DESC")
     return consultar_todos(sql, tuple(parametros))

@@ -38,6 +38,10 @@ def validar_entrada():
 def obtener_factura(id_entrada):
     return (jsonify(servicio.factura(id_entrada, usuario_actual())), 200)
 
+@entradas_bp.post('/entradas/<int:id_entrada>/pagar')
+def pagar_entrada(id_entrada):
+    return (jsonify(servicio.pagar(id_entrada, usuario_actual())), 200)
+
 @entradas_bp.post('/entradas/<int:id_entrada>/reenviar')
 def reenviar_entrada(id_entrada):
     return (jsonify(servicio.reenviar(id_entrada, usuario_actual())), 200)
@@ -46,6 +50,16 @@ def reenviar_entrada(id_entrada):
 @requiere_admin
 def estadisticas_cancelaciones():
     return (jsonify(servicio.estadisticas_cancelaciones(request.args)), 200)
+
+@entradas_bp.get('/entradas/estadisticas/ocupacion')
+@requiere_admin
+def estadisticas_ocupacion():
+    return (jsonify(servicio.estadisticas_ocupacion(request.args)), 200)
+
+@entradas_bp.get('/entradas/estadisticas/ventas-genero')
+@requiere_admin
+def estadisticas_ventas_genero():
+    return (jsonify(servicio.estadisticas_ventas_genero(request.args)), 200)
 
 @entradas_bp.get('/entradas/estadisticas/franjas-horarias')
 @requiere_admin
