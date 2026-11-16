@@ -8,31 +8,18 @@
       <a class="back-link" href="{{ url_for('vistas.cartelera') }}">← Volver a cartelera</a>
       <h1>Elegí tus butacas</h1>
       <p class="muted">
-        {{ funcion.local | default('Cine Paradiso · Alto Palermo') }} ·
-        {{ funcion.sala | default('Sala 4') }} ·
+        {{ funcion.local | default('error al cargar local') }} ·
+        {{ funcion.sala | default('error al cargar sala') }} ·
         {% block capacidad_sala %}Capacidad estándar{% endblock %}
       </p>
     </div>
-    <span class="pill">{{ funcion.clasificacion | default('ATP') }}</span>
-  </div>
-
-  <div class="showtime-row">
-    <div>
-      <span class="eyebrow">HORARIOS DISPONIBLES</span>
-      <p class="muted small">Seleccioná una función</p>
-    </div>
-    <div class="showtimes">
-      <button type="button" class="time-button">14:30</button>
-      <button type="button" class="time-button">17:15</button>
-      <button type="button" class="time-button selected">19:45</button>
-      <button type="button" class="time-button">22:10</button>
-    </div>
+    <span class="pill">{{ funcion.clasificacion | default('404') }}</span>
   </div>
 
   <div class="panel seat-panel">
     <div class="seat-intro">
       <h2>Mapa de sala</h2>
-      <span class="muted small">General ${{ funcion.precio | default(6900) }} por butaca</span>
+      <span class="muted small">General ${{ funcion.precio }} por butaca</span>
     </div>
 
     <div class="screen-wrap">

@@ -431,6 +431,11 @@ button {
   gap: 8px;
 }
 
+.showtime-hour {
+  font-size: 10px;
+  display: block;
+}
+
 .time-button {
   background: #202020;
   border: 1px solid #333;

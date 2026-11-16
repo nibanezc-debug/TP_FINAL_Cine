@@ -9,12 +9,12 @@ echo ":popcorn: INICIANDO CINE PARADISO..."
 echo "========================================="
 
 # 1. Variables de entorno desde .env (ese archivo NO se sube a Git)
-if [ ! -f .env.example ]; then
-  echo ":x: Falta el archivo .env.example." >&2
+if [ ! -f .env ]; then
+  echo ":x: Falta el archivo .env" >&2
   exit 1
 fi
 set -a
-source .env.example
+source .env
 set +a
 : "${FLASK_SECRET_KEY:?Falta FLASK_SECRET_KEY en .env}"
 : "${FRONT_SECRET_KEY:?Falta FRONT_SECRET_KEY en .env}"

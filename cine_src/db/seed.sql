@@ -86,6 +86,3 @@ INSERT INTO servicios (nombre, precio, activo) VALUES
   ('Combo Pareja', 18500, 1),
   ('Gaseosa grande', 4900, 1),
   ('Mix de golosinas', 3500, 1);
-
-INSERT INTO usuarios (nombre, email, password, rol, fecha_registro) VALUES
- ('usuario', 'usuario@gmail.com', 'usuario', 'administrador', '2026-11-13 13:15:00');
