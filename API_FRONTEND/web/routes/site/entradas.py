@@ -104,6 +104,32 @@ def vista_entradas():
     return render_template("mis_entradas.html", active_page="entradas", entradas=entradas)
 
 
+@entradas_bp.route("/entradas/<int:id_entrada>")
+def vista_entrada(id_entrada):
+    if not session.get("usuario_id"):
+        flash("Iniciá sesión para ver tus entradas.")
+        return redirect(url_for("vistas.cartelera"))
+
+    # Si la entrada no existe (404) o es de otro usuario (403), llamar_api muestra la página de error
+    entrada, _ = llamar_api("GET", f"/entradas/{id_entrada}")
+    funcion, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}")
+    butacas, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}/butacas")
+
+    # El detalle trae solo el id de la butaca; buscamos su fila y columna
+    butaca = f"#{entrada['id_butaca']}"
+    for b in butacas or []:
+        if b["id"] == entrada["id_butaca"]:
+            butaca = f"{b['fila']}{b['columna']}"
+
+    return render_template(
+        "entrada.html",
+        active_page="entradas",
+        entrada=entrada,
+        funcion=funcion,
+        butaca=butaca,
+    )
+
+
 @entradas_bp.route("/entradas/<int:id_entrada>/cancelar", methods=["POST"])
 def cancelar_entrada(id_entrada):
     try:
