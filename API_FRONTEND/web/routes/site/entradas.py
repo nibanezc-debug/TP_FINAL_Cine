@@ -121,12 +121,19 @@ def vista_entrada(id_entrada):
         if b["id"] == entrada["id_butaca"]:
             butaca = f"{b['fila']}{b['columna']}"
 
+    # El QR solo existe para entradas activas; el backend lo arma con el código guardado
+    qr_data = None
+    if entrada["estado"] == "activa":
+        _, resp = llamar_api("GET", f"/entradas/{id_entrada}/qr")
+        qr_data = "data:image/png;base64," + base64.b64encode(resp.content).decode("ascii")
+
     return render_template(
         "entrada.html",
         active_page="entradas",
         entrada=entrada,
         funcion=funcion,
         butaca=butaca,
+        qr_data=qr_data,
     )
 
 

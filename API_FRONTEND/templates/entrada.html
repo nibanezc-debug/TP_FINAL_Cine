@@ -13,6 +13,17 @@
   <div class="receipt-wrap">
     <article class="receipt-card">
       <div class="receipt-top"></div>
+      {% if qr_data %}
+      <div class="qr-area">
+        <img class="qr-code" src="{{ qr_data }}" alt="Código QR de la entrada {{ entrada.id }}" />
+        <strong class="mono">{{ entrada.codigo_qr[:16] }}…</strong>
+        <span class="muted tiny">Código de acceso</span>
+      </div>
+      {% else %}
+      <div class="qr-area">
+        <span class="muted small">Esta entrada está {{ entrada.estado }}, por eso no tiene un QR para mostrar.</span>
+      </div>
+      {% endif %}
       <div class="receipt-film">
         <h2>{{ funcion.titulo }} <span class="pill">{{ entrada.estado | capitalize }}</span></h2>
         <p class="muted small">{{ funcion.local }} · {{ funcion.sala }}</p>
