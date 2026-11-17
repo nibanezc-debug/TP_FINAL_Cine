@@ -157,10 +157,23 @@ def ocupacion(agrupar: str, periodo: dict):
                "HAVING COUNT(CASE WHEN e.estado <> 'cancelada' THEN 1 END) > 0 ORDER BY ocupacion DESC")
     return [_serializar(fila) for fila in consultar_todos(sql, tuple(parametros))]
 
+
 def ventas_por_genero(periodo: dict):
     condiciones, parametros = _condiciones_periodo(periodo)
+
     condiciones.append("e.estado <> 'cancelada'")
-    sql = ('SELECT p.genero, COUNT(*) AS entradas, CAST(SUM(e.precio) AS UNSIGNED) AS recaudado '
-           'FROM entradas e JOIN funciones f ON f.id = e.id_funcion JOIN peliculas p ON p.id_pelicula = f.id_pelicula '
-           f"{_donde(condiciones)}GROUP BY p.genero ORDER BY recaudado DESC")
+    condiciones.append("r.estado = 'pagada'")
+
+    sql = (
+        'SELECT p.genero, COUNT(*) AS entradas, '
+        'SUM(e.precio) AS recaudado '
+        'FROM entradas e '
+        'JOIN reservas r ON r.id = e.id_reserva '
+        'JOIN funciones f ON f.id = e.id_funcion '
+        'JOIN peliculas p ON p.id_pelicula = f.id_pelicula '
+        f'{_donde(condiciones)}'
+        'GROUP BY p.genero '
+        'ORDER BY recaudado DESC'
+    )
+
     return consultar_todos(sql, tuple(parametros))
