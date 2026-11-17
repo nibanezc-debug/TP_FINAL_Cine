@@ -1,6 +1,7 @@
 import base64
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from werkzeug.exceptions import HTTPException
 
 from api_client import llamar_api
 
@@ -105,6 +106,18 @@ def vista_entradas():
 
 @entradas_bp.route("/entradas/<int:id_entrada>/cancelar", methods=["POST"])
 def cancelar_entrada(id_entrada):
-    llamar_api("PATCH", f"/entradas/{id_entrada}/cancelar")
-    flash("Entrada cancelada correctamente. La butaca quedó liberada.")
+    try:
+        llamar_api("PATCH", f"/entradas/{id_entrada}/cancelar")
+    except HTTPException as error:
+        # Sesión vencida o sin permiso: se muestran como siempre, no como error de cancelación
+        if error.code in (401, 403):
+            raise
+        # 409: usada o cancelada, 422: venció el plazo, 404: no existe
+        if error.code in (404, 409, 422):
+            flash(f"No se pudo cancelar la entrada: {error.description}")
+        else:
+            flash("No se pudo completar la cancelación. Intentá de nuevo más tarde.")
+        return redirect(url_for("entradas.vista_entradas"))
+
+    flash("Entrada cancelada correctamente. La butaca quedó liberada.", "exito")
     return redirect(url_for("entradas.vista_entradas"))

@@ -51,8 +51,12 @@
     </header>
 
     <main>
-      {% for mensaje in get_flashed_messages() %}
+      {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+        {% if categoria == 'exito' %}
+        <div class="panel" style="border-color: var(--green); margin-top: 20px; color: var(--green);">
+        {% else %}
         <div class="panel" style="border-color: var(--red); margin-top: 20px; color: #ff777d;">
+        {% endif %}
           {{ mensaje }}
         </div>
       {% endfor %}
