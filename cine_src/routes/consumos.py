@@ -3,6 +3,10 @@ from security import usuario_actual
 from services import consumos as servicio
 consumos_bp = Blueprint('consumos', __name__)
 
+@consumos_bp.get('/reservas/<int:id_reserva>')
+def estado_reserva(id_reserva):
+    return (jsonify(servicio.estado(id_reserva, usuario_actual())), 200)
+
 @consumos_bp.get('/reservas/<int:id_reserva>/consumos')
 def listar_consumos(id_reserva):
     return (jsonify(servicio.listar(id_reserva, usuario_actual())), 200)
