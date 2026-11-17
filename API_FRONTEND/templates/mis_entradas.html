@@ -20,6 +20,7 @@
       </div>
       <div style="text-align:right;">
         <b>${{ e.precio }}</b><br />
+        <a class="button button-small" href="{{ url_for('entradas.vista_entrada', id_entrada=e.id) }}">Ver entrada</a>
         {% if e.estado == 'activa' %}
         <form action="{{ url_for('entradas.cancelar_entrada', id_entrada=e.id) }}" method="post"
               onsubmit="return confirm('¿Seguro que querés cancelar esta entrada?');">

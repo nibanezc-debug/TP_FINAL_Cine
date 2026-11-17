@@ -6,9 +6,9 @@
   <div class="success-banner">
     <span class="success-icon">✓</span>
     <div>
-      <span class="eyebrow">¡COMPRA CONFIRMADA!</span>
-      <h1>Ya tenés tus entradas.</h1>
-      <p class="muted">Presentá el código QR en el ingreso a la sala. También te lo enviamos por email.</p>
+      <span class="eyebrow">RESERVA REGISTRADA</span>
+      <h1>Tus butacas quedaron reservadas.</h1>
+      <p class="muted">El pago todavía está pendiente.</p>
     </div>
   </div>
   <div class="receipt-wrap">
@@ -39,7 +39,7 @@
         <div><span>Email</span><b>{{ factura.reserva.email }}</b></div>
         <div><span>Entradas</span><b>${{ factura.total_entradas }}</b></div>
         <div><span>Servicios</span><b>${{ factura.total_servicios }}</b></div>
-        <div class="invoice-total"><span>Total pagado</span><strong>${{ factura.total }}</strong></div>
+        <div class="invoice-total"><span>Total</span><strong>${{ factura.total }}</strong></div>
       </div>
       <div class="receipt-actions">
         <a class="button" href="{{ url_for('entradas.vista_entradas') }}">Ver mis entradas</a>

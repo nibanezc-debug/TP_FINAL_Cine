@@ -1,15 +1,17 @@
 import requests
 from flask import abort, current_app, session
 
-CODIGOS_ERROR = (400, 401, 403, 404, 405, 409, 500, 502, 503)
+CODIGOS_ERROR = (400, 401, 403, 404, 405, 409, 422, 500, 502, 503)
 
 
 def llamar_api(metodo, ruta, con_sesion=True, **kwargs):
     url = f"{current_app.config['API_URL']}{ruta}"
     cookies = (session.get("api_cookies") or {}) if con_sesion else {}
     try:
-        resp = requests.request(metodo, url, cookies=cookies, timeout=5, **kwargs)
-    except requests.exceptions.RequestException:
+        resp = requests.request(metodo, url, cookies=cookies, timeout=30, **kwargs)
+    
+    except requests.exceptions.RequestException as error:
+        print("ERROR DE CONEXIÓN:", error)
         abort(503, description="No se pudo conectar con el backend")
 
     try:

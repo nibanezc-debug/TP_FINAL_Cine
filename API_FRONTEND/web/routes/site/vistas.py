@@ -38,8 +38,8 @@ def gestion():
         try:
             datos_ext, _ = llamar_api("GET", f"/peliculas/externas?titulo={titulo_busqueda}")
             externas = datos_ext.get("resultados", [])
-        except HTTPException:
-            flash("Error al buscar en OMDb.")
+        except HTTPException as error:
+            flash(f"Error al buscar en OMDb : {error.description}")
 
     return render_template("gestion.html", active_page="gestion", peliculas=peliculas, externas=externas)
 
@@ -84,22 +84,121 @@ def eliminar_pelicula(id_pelicula):
         
     return redirect(url_for("vistas.gestion"))
 
-@vistas_bp.route("/checkout")
-def checkout():
-    return render_template("checkout.html", active_page="checkout")
-
-@vistas_bp.route("/comprobante")
-def comprobante():
-    return render_template("comprobante.html", active_page="comprobante")
-
-@vistas_bp.route("/entradas")
-def entradas():
-    if not session.get("usuario_id"):
-        return redirect(url_for("vistas.cartelera"))
-    return render_template("mis_entradas.html", active_page="entradas")
-
 @vistas_bp.route("/dashboard")
 def dashboard():
+
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
-    return render_template("dashboard.html", active_page="dashboard")
+
+    ocupacion = []
+    ventas_genero = []
+    franjas_horarias = []
+    cancelaciones = []
+    funciones = []
+
+    try:
+        ocupacion, _ = llamar_api(
+            "GET", "/entradas/estadisticas/ocupacion"
+        )
+
+        ventas_genero, _ = llamar_api(
+            "GET", "/entradas/estadisticas/ventas-genero"
+        )
+
+        franjas_horarias, _ = llamar_api(
+            "GET", "/entradas/estadisticas/franjas-horarias"
+        )
+
+        cancelaciones, _ = llamar_api(
+            "GET", "/entradas/estadisticas/cancelaciones"
+        )
+
+        funciones, _ = llamar_api(
+            "GET", "/funciones"
+        )
+
+    except HTTPException as error:
+        flash("No se pudieron cargar las estadísticas")
+        ocupacion = []
+        ventas_genero = []
+        franjas_horarias = []
+        cancelaciones = []
+        funciones = []
+#calculo todo para despues usar en el front
+    total_entradas = 0
+    importe_entradas = 0
+
+    for genero in ventas_genero:
+        total_entradas += genero["entradas"]
+        importe_entradas += genero["recaudado"]
+
+    total_vendidas = 0
+    capacidad_total = 0
+
+    for funcion in ocupacion:
+        total_vendidas += funcion["vendidas"]
+        capacidad_total += funcion["capacidad"]
+
+    porcentaje_ocupacion = 0
+
+    if capacidad_total > 0:
+        porcentaje_ocupacion = round(
+            total_vendidas * 100 / capacidad_total, 1
+        )
+
+    total_cancelaciones = 0
+
+    for fila in cancelaciones:
+        total_cancelaciones += fila["cancelaciones"]
+
+    return render_template(
+        "dashboard.html",
+        active_page="dashboard",
+        ocupacion=ocupacion,
+        ventas_genero=ventas_genero,
+        franjas_horarias=franjas_horarias,
+        cancelaciones=cancelaciones,
+        funciones=funciones,
+        total_entradas=total_entradas,
+        importe_entradas=importe_entradas,
+        porcentaje_ocupacion=porcentaje_ocupacion,
+        total_cancelaciones=total_cancelaciones
+    )
+
+
+
+@vistas_bp.route("/gestion/qr", methods=["GET", "POST"])
+def validar_qr():
+
+    if session.get("rol") != "administrador":
+        return redirect(url_for("vistas.cartelera"))
+
+    if request.method == "POST":
+
+        codigo_qr = request.form.get("codigo_qr", "").strip()
+        id_funcion = request.form.get("id_funcion", type=int)
+
+        datos = {
+            "codigo_qr": codigo_qr,
+            "id_funcion": id_funcion
+        }
+
+        try:
+            resultado, _ = llamar_api(
+                "POST",
+                "/entradas/validar",
+                json=datos
+            )
+
+            if resultado.get("valida"):
+                flash("Entrada válida. Ingreso autorizado.")
+
+        except HTTPException as error:
+            flash("No se pudo validar la entrada: " + error.description)
+
+        return redirect(url_for("vistas.validar_qr"))
+
+    return render_template(
+        "qr.html",
+        active_page="qr"
+    )
