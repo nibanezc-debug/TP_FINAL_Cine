@@ -84,21 +84,6 @@ def eliminar_pelicula(id_pelicula):
         
     return redirect(url_for("vistas.gestion"))
 
-@vistas_bp.route("/checkout")
-def checkout():
-    return render_template("checkout.html", active_page="checkout")
-
-@vistas_bp.route("/comprobante")
-def comprobante():
-    return render_template("comprobante.html", active_page="comprobante")
-
-@vistas_bp.route("/entradas")
-def entradas():
-    if not session.get("usuario_id"):
-        return redirect(url_for("vistas.cartelera"))
-    return render_template("mis_entradas.html", active_page="entradas")
-
-
 @vistas_bp.route("/dashboard")
 def dashboard():
 

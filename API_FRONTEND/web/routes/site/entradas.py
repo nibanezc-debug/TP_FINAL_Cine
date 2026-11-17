@@ -15,9 +15,15 @@ def vista_checkout():
 
     carrito = session.get("carrito")
     if not carrito:
-        return redirect(url_for("cartelera"))
+        flash("Todavía no elegiste butacas. Elegí una función para continuar.")
+        return redirect(url_for("vistas.cartelera"))
 
-    funcion, _ = llamar_api("GET", f"/funciones/{carrito['id_funcion']}", con_sesion=False)
+    if not session.get("usuario_id"):
+        flash("Iniciá sesión para finalizar la compra.")
+        return redirect(url_for("vistas.cartelera"))
+
+    # El detalle de la función requiere login, así que va con la sesión (api_cookies)
+    funcion, _ = llamar_api("GET", f"/funciones/{carrito['id_funcion']}")
     funcion = funcion or {}
     cantidad = len(carrito["butacas_ids"])
 
@@ -34,11 +40,12 @@ def vista_checkout():
 def _confirmar_compra():
     carrito = session.get("carrito")
     if not carrito:
-        return redirect(url_for("cartelera"))
+        flash("Todavía no elegiste butacas. Elegí una función para continuar.")
+        return redirect(url_for("vistas.cartelera"))
 
     if not session.get("usuario_id"):
         flash("Iniciá sesión para finalizar la compra.")
-        return redirect(url_for("cartelera"))
+        return redirect(url_for("vistas.cartelera"))
 
     datos, _ = llamar_api(
         "POST",
@@ -71,7 +78,7 @@ def vista_comprobante():
         entradas.append({**entrada, "qr_data": qr_data})
 
         if not funcion:
-            funcion, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}", con_sesion=False)
+            funcion, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}")
         if factura is None:
             factura, _ = llamar_api("GET", f"/entradas/{id_entrada}/factura")
 
@@ -88,7 +95,8 @@ def vista_comprobante():
 @entradas_bp.route("/entradas")
 def vista_entradas():
     if not session.get("usuario_id"):
-        return redirect(url_for("cartelera"))
+        flash("Iniciá sesión para ver tus entradas.")
+        return redirect(url_for("vistas.cartelera"))
 
     datos, _ = llamar_api("GET", "/entradas/mias")
     entradas = datos if isinstance(datos, list) else (datos or {}).get("entradas", [])
