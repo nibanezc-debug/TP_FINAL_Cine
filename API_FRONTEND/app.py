@@ -5,6 +5,7 @@ from api_client import CODIGOS_ERROR
 
 # Importamos todos los blueprints
 from web.routes.site.butacas import butacas_bp
+from web.routes.site.entradas import checkout_bp, comprobante_bp, entradas_bp
 from web.routes.site.funcion import funcion_bp
 from web.routes.site.funciones_admin import funciones_admin_bp
 from web.routes.site.vistas import vistas_bp 
@@ -38,6 +39,9 @@ def crear_app():
     app.register_blueprint(vistas_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(usuarios_bp)
+    app.register_blueprint(checkout_bp)
+    app.register_blueprint(comprobante_bp)
+    app.register_blueprint(entradas_bp)
 
     return app
 
