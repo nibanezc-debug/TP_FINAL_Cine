@@ -29,6 +29,8 @@
           <a class="nav-link" href="{{ url_for('funciones_admin.listar_funciones_admin') }}">Funciones</a>
           <a class="nav-link {% if active_page == 'usuarios' %}active{% endif %}" href="{{ url_for('usuarios_admin.listar_usuarios') }}">Usuarios</a>
           <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('vistas.dashboard') }}">Dashboard</a>
+          <a class="nav-link {% if active_page == 'qr' %}active{% endif %}" href="{{ url_for('vistas.validar_qr') }}">Validar QR</a>
+
         {% endif %}
       </nav>
 

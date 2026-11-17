@@ -8,8 +8,10 @@ def llamar_api(metodo, ruta, con_sesion=True, **kwargs):
     url = f"{current_app.config['API_URL']}{ruta}"
     cookies = (session.get("api_cookies") or {}) if con_sesion else {}
     try:
-        resp = requests.request(metodo, url, cookies=cookies, timeout=5, **kwargs)
-    except requests.exceptions.RequestException:
+        resp = requests.request(metodo, url, cookies=cookies, timeout=30, **kwargs)
+    
+    except requests.exceptions.RequestException as error:
+        print("ERROR DE CONEXIÓN:", error)
         abort(503, description="No se pudo conectar con el backend")
 
     try:
