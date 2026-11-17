@@ -1,7 +1,7 @@
 import requests
 from flask import abort, current_app, session
 
-CODIGOS_ERROR = (400, 401, 403, 404, 405, 409, 500, 502, 503)
+CODIGOS_ERROR = (400, 401, 403, 404, 405, 409, 422, 500, 502, 503)
 
 
 def llamar_api(metodo, ruta, con_sesion=True, **kwargs):
