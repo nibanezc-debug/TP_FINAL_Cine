@@ -21,6 +21,9 @@
 
         {% if session.get('usuario_id') %}
           <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas.vista_entradas') }}">Mis entradas</a>
+          {% if session.get('rol') == 'cliente' %}
+          <a class="nav-link {% if active_page == 'mis_reservas' %}active{% endif %}" href="{{ url_for('consumos_web.mis_reservas') }}">Mis reservas</a>
+          {% endif %}
         {% endif %}
 
         {% if session.get('rol') == 'administrador' %}

@@ -62,7 +62,8 @@ def _confirmar_compra():
         "ids_entradas": ids_entradas,
     }
     session.pop("carrito", None)
-    return redirect(url_for("comprobante.vista_comprobante"))
+    # La reserva queda pendiente: primero se eligen los servicios adicionales.
+    return redirect(url_for("consumos_web.mostrar_consumos", id_reserva=datos["id_reserva"]))
 
 @comprobante_bp.route("/comprobante")
 def vista_comprobante():

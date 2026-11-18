@@ -77,7 +77,8 @@ def pagar(id_entrada: int, usuario: dict):
     destinatario = repositorio.obtener_usuario(entrada['id_usuario'])
     if destinatario is None:
         raise ApiError('El usuario de la entrada no existe', 404)
-    datos_factura = repositorio.obtener_factura(entrada['id_reserva'])
+    # El correo usa total, total_entradas y total_servicios, no solo filas.
+    datos_factura = factura(id_entrada, usuario)
     entradas = repositorio.entradas_de_reserva(entrada['id_reserva'])
     adjuntos_qr = [(e['id'], _png_qr(e['codigo_qr'])) for e in entradas if e['estado'] == 'activa']
     correo.enviar_compra(destinatario, datos_factura, adjuntos_qr)
