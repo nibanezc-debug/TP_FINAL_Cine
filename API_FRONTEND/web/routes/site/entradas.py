@@ -41,7 +41,6 @@ def vista_checkout():
 def _confirmar_compra():
     carrito = session.get("carrito")
     if not carrito:
-        flash("Todavía no elegiste butacas. Elegí una función para continuar.")
         return redirect(url_for("vistas.cartelera"))
 
     if not session.get("usuario_id"):
@@ -54,13 +53,16 @@ def _confirmar_compra():
         json={"id_funcion": carrito["id_funcion"], "butacas": carrito["butacas_ids"]},
     )
 
+    ids_entradas = [e["id"] for e in datos.get("entradas", [])]
+    for id_entrada in ids_entradas:
+        llamar_api("POST", f"/entradas/{id_entrada}/reenviar")
+
     session["compra"] = {
         "id_reserva": datos.get("id_reserva"),
-        "ids_entradas": [e["id"] for e in datos.get("entradas", [])],
+        "ids_entradas": ids_entradas,
     }
     session.pop("carrito", None)
     return redirect(url_for("comprobante.vista_comprobante"))
-
 
 @comprobante_bp.route("/comprobante")
 def vista_comprobante():
