@@ -22,8 +22,9 @@
         <div style="padding: 10px;">
           <b style="font-size: 12px; display: block;">{{ ext.titulo }}</b>
           <small>{{ ext.genero }} ({{ ext.duracion_minutos }} min)</small>
-          <button type="button" class="button button-small button-full" style="margin-top: 10px;" 
-                  onclick='usarExterna({{ ext | tojson }})'>Usar datos</button>
+          <button type="button" class="button button-small button-full" style="margin-top: 10px;"
+                  data-pelicula="{{ ext | tojson | forceescape }}"
+                  onclick="usarExterna(JSON.parse(this.dataset.pelicula))">Usar datos</button>
         </div>
       </div>
       {% endfor %}
@@ -38,13 +39,13 @@
           <h2>Catálogo Interno</h2>
           <span class="muted small">{{ peliculas | length }} películas cargadas</span>
         </div>
-        
+
         <form method="get" action="{{ url_for('vistas.gestion') }}" style="display: flex; gap: 5px;">
           <input type="text" name="titulo_omdb" placeholder="Buscar en OMDb..." style="padding: 5px; background: #222; color: #fff; border: 1px solid #444; border-radius: 5px;" required>
           <button type="submit" class="button button-ghost button-small">↻ Buscar externa</button>
         </form>
       </div>
-      
+
       <div class="table-wrap">
         <table class="data-table">
           <thead>
@@ -63,7 +64,7 @@
             {% for p in peliculas %}
             <tr>
               <td style="color: var(--green);"><strong>#{{ p.id_pelicula }}</strong></td>
-              
+
               <td>
                 <div class="movie-cell">
                   <img src="{{ p.poster_url or '#' }}" style="width:30px; height:38px; object-fit:cover; border-radius:4px;">
@@ -89,7 +90,9 @@
               </td>
               <td>
                 <div class="table-actions">
-                  <button type="button" title="Editar" onclick='abrirModalPelicula({{ p | tojson }})'>✎</button>
+                  <button type="button" title="Editar"
+                          data-pelicula="{{ p | tojson | forceescape }}"
+                          onclick="abrirModalPelicula(JSON.parse(this.dataset.pelicula))">✎</button>
                   <form method="post" action="{{ url_for('vistas.eliminar_pelicula', id_pelicula=p.id_pelicula) }}" style="display:inline;" onsubmit="return confirm('¿Dar de baja esta película?');">
                     <button type="submit" title="Dar de baja">⌫</button>
                   </form>
@@ -111,9 +114,9 @@
         <h2 id="movieDialogTitle">Nueva película</h2>
         <button type="button" class="icon-button" onclick="document.getElementById('movieDialog').close()" aria-label="Cerrar">✕</button>
       </div>
-      
+
       <input type="hidden" id="id_pelicula" name="id_pelicula">
-      
+
       <label class="field">
         <span>TÍTULO</span>
         <input id="title" name="title" required placeholder="Nombre de la película"/>
@@ -126,7 +129,7 @@
         <span>SINOPSIS</span>
         <input id="sinopsis" name="sinopsis" placeholder="Breve descripción..."/>
       </label>
-      
+
       <div class="form-two" style="margin-top:10px;">
         <label class="field">
           <span>GÉNERO</span>
@@ -137,7 +140,7 @@
           <input id="duration" name="duration" type="number" min="1" required placeholder="120"/>
         </label>
       </div>
-      
+
       <div class="form-two" style="margin-top:10px;">
         <label class="field">
           <span>CLASIFICACIÓN</span>
@@ -156,7 +159,7 @@
           </select>
         </label>
       </div>
-      
+
       <div class="form-two" style="margin-top:10px;">
         <label class="field">
           <span>DISPONIBLE DESDE</span>
@@ -175,7 +178,9 @@
     </form>
   </dialog>
 </section>
+{% endblock %}
 
+{% block scripts %}
 <script>
 function aDatetimeLocal(valor) {
   if (!valor) return '';

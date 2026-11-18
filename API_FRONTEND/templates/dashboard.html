@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Dashboard | Cine Paradiso{% endblock %}
@@ -21,7 +20,6 @@
 
     <div class="kpi-grid">
 
-        
         <article class="panel kpi">
             <span>Ventas cobradas</span>
             <strong>${{ importe_entradas }}</strong>
@@ -29,7 +27,6 @@
                 Total de entradas pagadas
             </small>
         </article>
-
 
         <article class="panel kpi">
             <span>Ocupación general</span>
@@ -144,7 +141,7 @@
                             </span>
 
                             <div class="progress">
-                                <i style="width: {{ funcion.ocupacion }}%"></i>
+                                <i data-width="{{ funcion.ocupacion }}"></i>
                             </div>
 
                             <b>{{ funcion.ocupacion }}%</b>
@@ -188,7 +185,7 @@
                             </span>
 
                             <div class="progress">
-                                <i style="width: {{ pelicula.ocupacion }}%"></i>
+                                <i data-width="{{ pelicula.ocupacion }}"></i>
                             </div>
 
                             <b>{{ pelicula.ocupacion }}%</b>
@@ -241,7 +238,6 @@
 
     </div>
 
-
     <p class="data-note">
         Los datos provienen de MySQL.
         Se muestran todas las fechas.
@@ -251,4 +247,12 @@
 
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('.progress i[data-width]').forEach(barra => {
+    barra.style.width = `${barra.dataset.width}%`;
+  });
+</script>
 {% endblock %}
