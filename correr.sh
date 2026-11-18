@@ -8,21 +8,20 @@ echo "========================================="
 echo ":popcorn: INICIANDO CINE PARADISO..."
 echo "========================================="
 
-# 1. Variables de entorno desde .env (ese archivo NO se sube a Git)
-if [ ! -f .env.example ]; then
-  echo ":x: Falta el archivo .env.example." >&2
+if [ ! -f .env ]; then
+  echo ":x: Falta el archivo .env (copiá .env.example a .env)." >&2
   exit 1
 fi
 set -a
-source .env.example
+source .env
 set +a
 : "${FLASK_SECRET_KEY:?Falta FLASK_SECRET_KEY en .env}"
 : "${FRONT_SECRET_KEY:?Falta FRONT_SECRET_KEY en .env}"
 
-# 2. Entorno virtual
+# Entorno virtual
 source .venv/bin/activate
 
-# 3. Base de datos (la contraseña va por variable de entorno, no por la línea de comandos)
+# Base de datos (la contraseña va por variable de entorno, no por la línea de comandos)
 export MYSQL_PWD="$DB_PASSWORD"
 MYSQL=(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --protocol=tcp)
 

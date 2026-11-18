@@ -16,17 +16,21 @@
     <span class="pill">{{ funcion.clasificacion | default('ATP') }}</span>
   </div>
 
-  <div class="showtime-row">
+<div class="showtime-row">
     <div>
-      <span class="eyebrow">HORARIOS DISPONIBLES</span>
-      <p class="muted small">Seleccioná una función</p>
+      <span class="eyebrow">FUNCIÓN SELECCIONADA</span>
+      <p class="muted small">
+        {{ funcion.titulo | default('Película') }}
+        {% if funcion.fecha_hora %}
+          · {{ funcion.fecha_hora[8:10] }}/{{ funcion.fecha_hora[5:7] }}/{{ funcion.fecha_hora[:4] }}
+        {% endif %}
+      </p>
     </div>
+    {% if funcion.fecha_hora %}
     <div class="showtimes">
-      <button type="button" class="time-button">14:30</button>
-      <button type="button" class="time-button">17:15</button>
-      <button type="button" class="time-button selected">19:45</button>
-      <button type="button" class="time-button">22:10</button>
+      <span class="time-button selected">{{ funcion.fecha_hora[11:16] }} hs</span>
     </div>
+    {% endif %}
   </div>
 
   <div class="panel seat-panel">

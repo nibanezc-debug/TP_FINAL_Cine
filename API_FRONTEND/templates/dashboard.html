@@ -126,7 +126,7 @@
 
             <h2>Ocupación por función</h2>
             <p class="muted small">
-                Porcentaje de butacas ocupadas
+                Porcentaje de butacas ocupadas por función
             </p>
 
             {% if ocupacion %}
@@ -137,7 +137,11 @@
 
                         <div class="occupancy-row">
 
-                            <span>{{ funcion.titulo }}</span>
+                            <span>
+                                {{ funcion.titulo }}
+                                {% if funcion.id_funcion %}<small class="muted"> · #{{ funcion.id_funcion }}</small>{% endif %}
+                                {% if funcion.fecha_hora %}<small class="muted"> ({{ funcion.fecha_hora[:16] }})</small>{% endif %}
+                            </span>
 
                             <div class="progress">
                                 <i style="width: {{ funcion.ocupacion }}%"></i>
@@ -155,6 +159,50 @@
 
                 <p class="muted">
                     No hay funciones registradas.
+                </p>
+
+            {% endif %}
+
+        </article>
+
+        <!-- OCUPACIÓN POR PELÍCULA -->
+
+        <article class="panel chart-panel occupancy">
+
+            <h2>Ocupación por película</h2>
+            <p class="muted small">
+                Porcentaje acumulado de butacas ocupadas por película
+            </p>
+
+            {% if ocupacion_pelicula %}
+
+                <div class="occupancy-list">
+
+                    {% for pelicula in ocupacion_pelicula %}
+
+                        <div class="occupancy-row">
+
+                            <span>
+                                {{ pelicula.titulo }}
+                                <small class="muted">({{ pelicula.vendidas }}/{{ pelicula.capacidad }})</small>
+                            </span>
+
+                            <div class="progress">
+                                <i style="width: {{ pelicula.ocupacion }}%"></i>
+                            </div>
+
+                            <b>{{ pelicula.ocupacion }}%</b>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <p class="muted">
+                    No hay películas con funciones registradas.
                 </p>
 
             {% endif %}

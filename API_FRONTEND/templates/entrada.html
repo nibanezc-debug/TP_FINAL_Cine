@@ -16,7 +16,7 @@
       {% if qr_data %}
       <div class="qr-area">
         <img class="qr-code" src="{{ qr_data }}" alt="Código QR de la entrada {{ entrada.id }}" />
-        <strong class="mono">{{ entrada.codigo_qr[:16] }}…</strong>
+        <strong class="mono" style="word-break: break-all; font-size: 0.85em;">{{ entrada.codigo_qr }}</strong>
         <span class="muted tiny">Código de acceso</span>
       </div>
       {% else %}

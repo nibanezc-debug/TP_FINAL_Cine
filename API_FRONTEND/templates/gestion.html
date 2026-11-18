@@ -54,6 +54,7 @@
               <th>Género</th>
               <th>Duración</th>
               <th>Clasif.</th>
+              <th>Disponibilidad</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -72,6 +73,15 @@
               <td>{{ p.genero }}</td>
               <td>{{ p.duracion_minutos }} min</td>
               <td>{{ p.clasificacion }}</td>
+              <td class="small muted">
+                {% if p.disponible_desde or p.disponible_hasta %}
+                  {{ p.disponible_desde[:10] if p.disponible_desde else '—' }}
+                  a
+                  {{ p.disponible_hasta[:10] if p.disponible_hasta else '—' }}
+                {% else %}
+                  Sin límite
+                {% endif %}
+              </td>
               <td>
                 <span class="state-dot {% if not p.activa %}Inactiva{% endif %}">
                   {{ 'Activa' if p.activa else 'Inactiva' }}
@@ -87,8 +97,7 @@
               </td>
             </tr>
             {% else %}
-            <!-- Cambiamos el colspan a 7 para que cubra la nueva columna -->
-            <tr><td colspan="7" style="text-align: center; color: #888;">No hay películas registradas.</td></tr>
+            <tr><td colspan="8" style="text-align: center; color: #888;">No hay películas registradas.</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -148,6 +157,17 @@
         </label>
       </div>
       
+      <div class="form-two" style="margin-top:10px;">
+        <label class="field">
+          <span>DISPONIBLE DESDE</span>
+          <input id="disponible_desde" name="disponible_desde" type="datetime-local" />
+        </label>
+        <label class="field">
+          <span>DISPONIBLE HASTA</span>
+          <input id="disponible_hasta" name="disponible_hasta" type="datetime-local" />
+        </label>
+      </div>
+
       <div class="modal-actions">
         <button type="button" class="button button-ghost" onclick="document.getElementById('movieDialog').close()">Cancelar</button>
         <button type="submit" class="button">Guardar película</button>
@@ -157,19 +177,34 @@
 </section>
 
 <script>
+function aDatetimeLocal(valor) {
+  if (!valor) return '';
+  return String(valor).replace(' ', 'T').slice(0, 16);
+}
+
+function normalizarClasificacion(valor) {
+  const validas = ['ATP', '+13', '+16', '+18'];
+  if (validas.includes(valor)) return valor;
+  const mapa = { 'G': 'ATP', 'PG': 'ATP', 'PG-13': '+13', 'R': '+16', 'NC-17': '+18' };
+  return mapa[valor] || 'ATP';
+}
+
 function abrirModalPelicula(pelicula = null) {
   const dialog = document.getElementById('movieDialog');
-  document.getElementById('movieDialogTitle').textContent = pelicula ? 'Editar película' : 'Nueva película';
-  
-  document.getElementById('id_pelicula').value = pelicula ? pelicula.id_pelicula : '';
-  document.getElementById('title').value = pelicula ? pelicula.titulo : '';
-  document.getElementById('genre').value = pelicula ? pelicula.genero : '';
-  document.getElementById('duration').value = pelicula ? pelicula.duracion_minutos : '';
-  document.getElementById('rating').value = pelicula ? pelicula.clasificacion : 'ATP';
-  document.getElementById('status').value = (pelicula && !pelicula.activa) ? 'Inactiva' : 'En cartelera';
+  const esEdicion = Boolean(pelicula && pelicula.id_pelicula);
+  document.getElementById('movieDialogTitle').textContent = esEdicion ? 'Editar película' : 'Nueva película';
+
+  document.getElementById('id_pelicula').value = pelicula ? (pelicula.id_pelicula || '') : '';
+  document.getElementById('title').value = pelicula ? (pelicula.titulo || '') : '';
+  document.getElementById('genre').value = pelicula ? (pelicula.genero || '') : '';
+  document.getElementById('duration').value = pelicula ? (pelicula.duracion_minutos || '') : '';
+  document.getElementById('rating').value = pelicula ? normalizarClasificacion(pelicula.clasificacion) : 'ATP';
+  document.getElementById('status').value = (pelicula && pelicula.activa === false) ? 'Inactiva' : 'En cartelera';
   document.getElementById('poster_url').value = pelicula ? (pelicula.poster_url || '') : '';
   document.getElementById('sinopsis').value = pelicula ? (pelicula.sinopsis || '') : '';
-  
+  document.getElementById('disponible_desde').value = pelicula ? aDatetimeLocal(pelicula.disponible_desde) : '';
+  document.getElementById('disponible_hasta').value = pelicula ? aDatetimeLocal(pelicula.disponible_hasta) : '';
+
   dialog.showModal();
 }
 
@@ -182,7 +217,9 @@ function usarExterna(ext) {
     clasificacion: ext.clasificacion,
     activa: true,
     poster_url: ext.poster_url,
-    sinopsis: ext.sinopsis
+    sinopsis: ext.sinopsis,
+    disponible_desde: '',
+    disponible_hasta: ''
   });
 }
 </script>

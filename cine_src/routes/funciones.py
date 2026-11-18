@@ -41,3 +41,8 @@ def modificar_funcion(id_funcion):
 def eliminar_funcion(id_funcion):
     servicio.eliminar_funcion(id_funcion)
     return "", 204
+
+@funciones_bp.get("/salas")
+@requiere_admin
+def listar_salas():
+    return jsonify(servicio.listar_salas()), 200

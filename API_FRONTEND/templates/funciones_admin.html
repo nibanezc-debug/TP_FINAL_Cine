@@ -1,56 +1,65 @@
-
 {% extends "base.html" %}
-{% block title %}Gestión de Funciones{% endblock %}
+{% block title %}Gestión de Funciones | Backoffice Cine Paradiso{% endblock %}
 
 {% block content %}
 <section class="view active">
   <div class="page-heading">
     <div>
-      <span class="eyebrow">BACKOFFICE</span>
+      <span class="eyebrow">BACKOFFICE · STAFF / ADMIN</span>
       <h1>Gestión de funciones</h1>
-      <p class="muted">
-        Administrá los horarios del cine.
-      </p>
+      <p class="muted">Asigná películas a un cine, sala y horario específico.</p>
     </div>
   </div>
 
-  {% for mensaje in get_flashed_messages() %}
-    <div class="panel">{{ mensaje }}</div>
-  {% endfor %}
-
-  <div class="panel">
+  <div class="panel" style="margin-bottom: 20px;">
     <h2>Crear nueva función</h2>
 
-    <form method="post"
-          action="{{ url_for('funciones_admin.crear_funcion_admin') }}">
+    <form method="post" action="{{ url_for('funciones_admin.crear_funcion_admin') }}">
+      <div class="form-two" style="margin-top: 12px;">
+        <label class="field">
+          <span>PELÍCULA</span>
+          <select name="id_pelicula" required>
+            <option value="">Seleccioná una película...</option>
+            {% for p in peliculas %}
+              <option value="{{ p.id_pelicula }}">
+                #{{ p.id_pelicula }} · {{ p.titulo }} ({{ p.duracion_minutos }} min){% if not p.activa %} [Inactiva]{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
 
-      <label class="field">
-        ID de película
-        <input type="number" name="id_pelicula"
-               min="1" required>
-      </label>
+        <label class="field">
+          <span>CINE Y SALA</span>
+          <select name="id_sala" required>
+            <option value="">Seleccioná cine y sala...</option>
+            {% for nombre_local, salas_local in salas | groupby('local') %}
+              <optgroup label="{{ nombre_local }}">
+                {% for s in salas_local %}
+                  <option value="{{ s.id }}">
+                    {{ s.nombre }} · {{ s.capacidad }} butacas ({{ s.formato }})
+                  </option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
 
-      <label class="field">
-        ID de sala
-        <input type="number" name="id_sala"
-               min="1" required>
-      </label>
+      <div class="form-two" style="margin-top: 12px;">
+        <label class="field">
+          <span>FECHA Y HORARIO</span>
+          <input type="datetime-local" name="fecha_hora" required>
+        </label>
 
-      <label class="field">
-        Fecha y horario
-        <input type="datetime-local"
-               name="fecha_hora" required>
-      </label>
+        <label class="field">
+          <span>PRECIO ($)</span>
+          <input type="number" name="precio" min="1" step="1" required placeholder="6900">
+        </label>
+      </div>
 
-      <label class="field">
-        Precio
-        <input type="number" name="precio"
-               min="1" step="1" required>
-      </label>
-
-      <button type="submit" class="button">
-        Crear función
-      </button>
+      <div style="margin-top: 14px;">
+        <button type="submit" class="button">Crear función</button>
+      </div>
     </form>
   </div>
 
@@ -58,47 +67,53 @@
     <h2>Funciones registradas</h2>
 
     {% for funcion in funciones %}
-      <div class="panel">
-        <h3>{{ funcion.titulo }}</h3>
+      {% set fh = (funcion.fecha_hora or '') | string | replace('T', ' ') %}
+      <div class="panel" style="margin-top: 14px;">
+        <h3>#{{ funcion.id }} · {{ funcion.titulo }}</h3>
+        <p class="muted small">
+          <strong>{{ funcion.local }}</strong> · {{ funcion.sala }}
+          {% if funcion.capacidad %} ({{ funcion.capacidad }} butacas · {{ funcion.formato }}){% endif %}
+          · {{ fh[:16] }} · ${{ funcion.precio }}
+        </p>
 
-        <p>Sala: {{ funcion.sala }}</p>
-        <p>Fecha: {{ funcion.fecha_hora }}</p>
-        <p>Precio: ${{ funcion.precio }}</p>
+        <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-top: 10px;">
+          <form method="post"
+                action="{{ url_for('funciones_admin.editar_funcion_admin', id_funcion=funcion.id) }}"
+                style="flex: 1; min-width: 260px;">
+            <div class="form-two">
+              <label class="field">
+                <span>CINE Y SALA</span>
+                <select name="id_sala">
+                  {% for nombre_local, salas_local in salas | groupby('local') %}
+                    <optgroup label="{{ nombre_local }}">
+                      {% for s in salas_local %}
+                        <option value="{{ s.id }}" {% if s.id == funcion.id_sala %}selected{% endif %}>
+                          {{ s.nombre }} · {{ s.capacidad }} butacas ({{ s.formato }})
+                        </option>
+                      {% endfor %}
+                    </optgroup>
+                  {% endfor %}
+                </select>
+              </label>
 
-        <form method="post"
-          action="{{ url_for(
-            'funciones_admin.editar_funcion_admin',
-            id_funcion=funcion.id
-          ) }}">
+              <label class="field">
+                <span>PRECIO ($)</span>
+                <input type="number" name="precio" min="1" step="1" value="{{ funcion.precio }}">
+              </label>
+            </div>
 
-          <label class="field">
-            Nuevo precio
-            <input type="number" name="precio"
-                   min="1" step="1"
-                   value="{{ funcion.precio }}">
-          </label>
+            <button type="submit" class="button button-ghost" style="margin-top: 10px;">Guardar cambios</button>
+          </form>
 
-          <button type="submit"
-                  class="button button-ghost">
-            Guardar cambios
-          </button>
-        </form>
-
-        <form method="post"
-          action="{{ url_for(
-            'funciones_admin.eliminar_funcion_admin',
-            id_funcion=funcion.id
-          ) }}"
-          onsubmit="return confirm('¿Eliminar esta función?')">
-
-          <button type="submit"
-                  class="button button-ghost">
-            Eliminar función
-          </button>
-        </form>
+          <form method="post"
+                action="{{ url_for('funciones_admin.eliminar_funcion_admin', id_funcion=funcion.id) }}"
+                onsubmit="return confirm('¿Eliminar esta función?')">
+            <button type="submit" class="button button-ghost">Eliminar función</button>
+          </form>
+        </div>
       </div>
     {% else %}
-      <p>No hay funciones registradas.</p>
+      <p class="muted">No hay funciones registradas.</p>
     {% endfor %}
   </div>
 </section>

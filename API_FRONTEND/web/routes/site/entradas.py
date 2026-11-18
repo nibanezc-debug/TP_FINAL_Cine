@@ -54,8 +54,11 @@ def _confirmar_compra():
     )
 
     ids_entradas = [e["id"] for e in datos.get("entradas", [])]
-    for id_entrada in ids_entradas:
-        llamar_api("POST", f"/entradas/{id_entrada}/reenviar")
+    try:
+        for id_entrada in ids_entradas:
+            llamar_api("POST", f"/entradas/{id_entrada}/reenviar")
+    except HTTPException:
+        flash("Compra registrada, pero no se pudo enviar el correo con el QR.")
 
     session["compra"] = {
         "id_reserva": datos.get("id_reserva"),
@@ -74,17 +77,22 @@ def vista_comprobante():
     entradas = []
     funcion = {}
     factura = None
+    mapa_butacas = {}
 
     for id_entrada in compra["ids_entradas"]:
         entrada, _ = llamar_api("GET", f"/entradas/{id_entrada}")
         _, resp = llamar_api("GET", f"/entradas/{id_entrada}/qr")
         qr_data = "data:image/png;base64," + base64.b64encode(resp.content).decode("ascii")
-        entradas.append({**entrada, "qr_data": qr_data})
 
         if not funcion:
             funcion, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}")
+            butacas, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}/butacas")
+            mapa_butacas = {b["id"]: f"{b['fila']}{b['columna']}" for b in (butacas or [])}
         if factura is None:
             factura, _ = llamar_api("GET", f"/entradas/{id_entrada}/factura")
+
+        butaca_label = mapa_butacas.get(entrada["id_butaca"], f"#{entrada['id_butaca']}")
+        entradas.append({**entrada, "qr_data": qr_data, "butaca_label": butaca_label})
 
     session.pop("compra", None)
     return render_template(
@@ -104,6 +112,24 @@ def vista_entradas():
 
     datos, _ = llamar_api("GET", "/entradas/mias")
     entradas = datos if isinstance(datos, list) else (datos or {}).get("entradas", [])
+
+    butacas_por_funcion = {}
+    for entrada in entradas:
+        id_funcion = entrada.get("id_funcion")
+        if id_funcion and id_funcion not in butacas_por_funcion:
+            try:
+                butacas, _ = llamar_api("GET", f"/funciones/{id_funcion}/butacas")
+                butacas_por_funcion[id_funcion] = {
+                    b["id"]: f"{b['fila']}{b['columna']}" for b in (butacas or [])
+                }
+            except HTTPException:
+                butacas_por_funcion[id_funcion] = {}
+
+        mapa = butacas_por_funcion.get(id_funcion, {})
+        entrada["butaca_label"] = mapa.get(
+            entrada.get("id_butaca"), f"#{entrada.get('id_butaca')}"
+        )
+
     return render_template("mis_entradas.html", active_page="entradas", entradas=entradas)
 
 

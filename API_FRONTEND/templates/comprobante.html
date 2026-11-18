@@ -6,9 +6,15 @@
   <div class="success-banner">
     <span class="success-icon">✓</span>
     <div>
+      {% if factura.reserva and factura.reserva.estado == 'pagada' %}
+      <span class="eyebrow">COMPRA CONFIRMADA</span>
+      <h1>¡Tu compra fue confirmada!</h1>
+      <p class="muted">Tus entradas y códigos QR ya están listos.</p>
+      {% else %}
       <span class="eyebrow">RESERVA REGISTRADA</span>
       <h1>Tus butacas quedaron reservadas.</h1>
       <p class="muted">El pago todavía está pendiente.</p>
+      {% endif %}
     </div>
   </div>
   <div class="receipt-wrap">
@@ -17,7 +23,7 @@
       <div class="receipt-top"></div>
       <div class="qr-area">
         <img class="qr-code" src="{{ e.qr_data }}" alt="Código QR de la entrada {{ e.id }}" />
-        <strong class="mono">{{ e.codigo_qr[:16] }}…</strong>
+        <strong class="mono" style="word-break: break-all; font-size: 0.85em;">{{ e.codigo_qr }}</strong>
         <span class="muted tiny">Código de acceso</span>
       </div>
       <div class="receipt-film">
@@ -26,7 +32,7 @@
         <div class="detail-grid">
           <span><small>Fecha</small><b>{{ funcion.fecha_hora[:10] }}</b></span>
           <span><small>Hora</small><b>{{ funcion.fecha_hora[11:16] }} hs</b></span>
-          <span><small>Butaca</small><b>#{{ e.id_butaca }}</b></span>
+          <span><small>Butaca</small><b>{{ e.butaca_label }}</b></span>
           <span><small>Precio</small><b>${{ e.precio }}</b></span>
         </div>
       </div>
