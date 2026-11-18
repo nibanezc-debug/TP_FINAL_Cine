@@ -10,7 +10,8 @@ from web.routes.site.funcion import funcion_bp
 from web.routes.site.funciones_admin import funciones_admin_bp
 from web.routes.site.vistas import vistas_bp 
 from web.routes.site.auth import auth_bp             
-from web.routes.site.usuarios import usuarios_bp    
+from web.routes.site.usuarios import usuarios_bp
+from web.routes.site.servicios import servicios_web_bp
 
 def mostrar_error(e):
     return render_template("error.html", codigo=e.code, mensaje=e.description), e.code
@@ -39,6 +40,7 @@ def crear_app():
     app.register_blueprint(vistas_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(usuarios_bp)
+    app.register_blueprint(servicios_web_bp)
     app.register_blueprint(checkout_bp)
     app.register_blueprint(comprobante_bp)
     app.register_blueprint(entradas_bp)
