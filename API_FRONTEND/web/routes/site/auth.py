@@ -4,13 +4,25 @@ from api_client import llamar_api
 
 auth_bp = Blueprint("auth", __name__)
 
+
+def destino_seguro(destino):
+    # Solo rutas internas como "/entradas/7/cancelar"; nada de "//otro.com", "http://..." ni "\".
+    # Los caracteres de control se rechazan porque el navegador los borra ("/\t/otro.com" -> "//otro.com").
+    if not destino or not destino.startswith("/") or destino.startswith("//") or "\\" in destino:
+        return None
+    if any(ord(c) < 32 or ord(c) == 127 for c in destino):
+        return None
+    return destino
+
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html", active_page="login")
+        return render_template("login.html", active_page="login", next=destino_seguro(request.args.get("next")))
 
     email = request.form.get("email", "").strip()
     password = request.form.get("password", "")
+    destino = destino_seguro(request.form.get("next"))
 
     try:
         try:
@@ -22,7 +34,7 @@ def login():
                 raise e
     except HTTPException as e:
         flash(f"Error al iniciar sesión: {e.description}")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", next=destino))
 
     datos = datos or {}
     usuario = datos.get("usuario", datos)
@@ -38,6 +50,9 @@ def login():
     session["rol"] = usuario.get("rol", "cliente")
     session["api_cookies"] = resp.cookies.get_dict()
 
+    # Si venía de un enlace (por ejemplo, cancelar desde el correo), vuelve ahí
+    if destino:
+        return redirect(destino)
     if session["rol"] == "administrador":
         return redirect(url_for("vistas.gestion"))
     return redirect(url_for("vistas.cartelera"))
