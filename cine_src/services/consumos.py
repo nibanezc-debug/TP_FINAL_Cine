@@ -11,6 +11,11 @@ def _validar_propietario(id_reserva: int, usuario: dict, permitir_admin: bool):
             raise ApiError('No podés acceder a esta reserva', 403)
     return reserva
 
+def estado(id_reserva: int, usuario: dict):
+    validar_id(id_reserva)
+    reserva = _validar_propietario(id_reserva, usuario, permitir_admin=False)
+    return {'id': reserva['id'], 'estado': reserva['estado']}
+
 def listar(id_reserva: int, usuario: dict):
     validar_id(id_reserva)
     _validar_propietario(id_reserva, usuario, permitir_admin=True)

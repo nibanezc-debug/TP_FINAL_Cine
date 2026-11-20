@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Gestión de servicios | Cine Paradiso{% endblock %}
+{% block content %}
+<section class="view active">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">BACKOFFICE · ADMINISTRADOR</span>
+      <h1>Catálogo de servicios</h1>
+      <p class="muted">Alta, edición y baja de productos del cine.</p>
+    </div>
+    <a class="button button-ghost" href="{{ url_for('vistas.gestion') }}">Volver a gestión</a>
+  </div>
+  <div class="panel" style="margin-bottom:20px">
+    <h2>Agregar servicio</h2>
+    <form method="post" action="{{ url_for('servicios_web.crear_servicio') }}" style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-top:14px">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="field" style="flex:2;min-width:200px"><span>NOMBRE</span><input name="nombre" maxlength="100" required placeholder="Ej. Pochoclos grandes"></label>
+      <label class="field" style="flex:1;min-width:120px"><span>PRECIO ($)</span><input name="precio" type="number" min="0" max="2147483647" step="1" required></label>
+      <button class="button" type="submit">Agregar servicio</button>
+    </form>
+  </div>
+  <div class="panel">
+    <div class="section-heading compact"><h2>Servicios activos</h2><span class="muted small">{{ servicios|length }} productos</span></div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>ID</th><th>Nombre y precio</th><th>Guardar cambios</th><th>Dar de baja</th></tr></thead>
+        <tbody>
+        {% for servicio in servicios %}
+          <tr>
+            <td>#{{ servicio.id }}</td>
+            <td>
+              <form id="editar-{{ servicio.id }}" method="post" action="{{ url_for('servicios_web.editar_servicio', identificador=servicio.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label class="field"><span>NOMBRE</span><input name="nombre" value="{{ servicio.nombre }}" maxlength="100" required></label>
+                <label class="field"><span>PRECIO ($)</span><input name="precio" value="{{ servicio.precio }}" type="number" min="0" max="2147483647" step="1" required></label>
+              </form>
+            </td>
+            <td><button class="button button-small" type="submit" form="editar-{{ servicio.id }}">Guardar</button></td>
+            <td>
+              <form method="post" action="{{ url_for('servicios_web.bajar_servicio', identificador=servicio.id) }}" onsubmit="return confirm('¿Dar de baja este producto?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="button button-small button-ghost" type="submit">Dar de baja</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="muted">Todavía no hay servicios activos. Agregá el primero arriba.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

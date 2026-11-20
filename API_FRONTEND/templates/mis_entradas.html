@@ -16,7 +16,7 @@
       <div>
         <span class="pill">{{ e.estado | capitalize }}</span>
         <h3 style="margin:8px 0 4px;">Función #{{ e.id_funcion }}</h3>
-        <p class="muted small">📅 {{ e.fecha_hora_funcion[:10] }} · 🕘 {{ e.fecha_hora_funcion[11:16] }} hs · 💺 Butaca #{{ e.id_butaca }}</p>
+        <p class="muted small">📅 {{ e.fecha_hora_funcion[:10] }} · 🕘 {{ e.fecha_hora_funcion[11:16] }} hs · 💺 Butaca {{ e.butaca_label }}</p>
       </div>
       <div style="text-align:right;">
         <b>${{ e.precio }}</b><br />

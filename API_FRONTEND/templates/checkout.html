@@ -43,12 +43,12 @@
       </div>
       {% if session.get('usuario_id') %}
       <form action="{{ url_for('checkout.vista_checkout') }}" method="post">
-        <button type="submit" class="button button-full">Confirmar pago</button>
+        <button type="submit" class="button button-full">Continuar a servicios adicionales</button>
       </form>
       {% else %}
       <p class="muted small">Iniciá sesión para poder confirmar la compra.</p>
       {% endif %}
-      <p class="secure-note">🔒 Recibirás tu QR por email al confirmar.</p>
+      <p class="secure-note">🔒 La reserva quedará pendiente hasta que confirmes la compra luego de elegir tus servicios.</p>
     </aside>
   </div>
 </section>

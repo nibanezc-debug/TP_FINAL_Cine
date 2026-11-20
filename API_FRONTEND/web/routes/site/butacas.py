@@ -19,7 +19,7 @@ def vista_butacas(id):
     butacas = butacas or []
     funcion = funcion or {}
 
-    template_elegido = TEMPLATES_POR_CAPACIDAD.get(len(butacas))
+    template_elegido = TEMPLATES_POR_CAPACIDAD.get(len(butacas), "butacas_250.html")
 
     return render_template(
         template_elegido,

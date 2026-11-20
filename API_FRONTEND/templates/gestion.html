@@ -22,8 +22,9 @@
         <div style="padding: 10px;">
           <b style="font-size: 12px; display: block;">{{ ext.titulo }}</b>
           <small>{{ ext.genero }} ({{ ext.duracion_minutos }} min)</small>
-          <button type="button" class="button button-small button-full" style="margin-top: 10px;" 
-                  onclick='usarExterna({{ ext | tojson }})'>Usar datos</button>
+          <button type="button" class="button button-small button-full" style="margin-top: 10px;"
+                  data-pelicula="{{ ext | tojson | forceescape }}"
+                  onclick="usarExterna(JSON.parse(this.dataset.pelicula))">Usar datos</button>
         </div>
       </div>
       {% endfor %}
@@ -38,13 +39,13 @@
           <h2>Catálogo Interno</h2>
           <span class="muted small">{{ peliculas | length }} películas cargadas</span>
         </div>
-        
+
         <form method="get" action="{{ url_for('vistas.gestion') }}" style="display: flex; gap: 5px;">
           <input type="text" name="titulo_omdb" placeholder="Buscar en OMDb..." style="padding: 5px; background: #222; color: #fff; border: 1px solid #444; border-radius: 5px;" required>
           <button type="submit" class="button button-ghost button-small">↻ Buscar externa</button>
         </form>
       </div>
-      
+
       <div class="table-wrap">
         <table class="data-table">
           <thead>
@@ -54,6 +55,7 @@
               <th>Género</th>
               <th>Duración</th>
               <th>Clasif.</th>
+              <th>Disponibilidad</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -62,7 +64,7 @@
             {% for p in peliculas %}
             <tr>
               <td style="color: var(--green);"><strong>#{{ p.id_pelicula }}</strong></td>
-              
+
               <td>
                 <div class="movie-cell">
                   <img src="{{ p.poster_url or '#' }}" style="width:30px; height:38px; object-fit:cover; border-radius:4px;">
@@ -72,6 +74,15 @@
               <td>{{ p.genero }}</td>
               <td>{{ p.duracion_minutos }} min</td>
               <td>{{ p.clasificacion }}</td>
+              <td class="small muted">
+                {% if p.disponible_desde or p.disponible_hasta %}
+                  {{ p.disponible_desde[:10] if p.disponible_desde else '—' }}
+                  a
+                  {{ p.disponible_hasta[:10] if p.disponible_hasta else '—' }}
+                {% else %}
+                  Sin límite
+                {% endif %}
+              </td>
               <td>
                 <span class="state-dot {% if not p.activa %}Inactiva{% endif %}">
                   {{ 'Activa' if p.activa else 'Inactiva' }}
@@ -79,7 +90,9 @@
               </td>
               <td>
                 <div class="table-actions">
-                  <button type="button" title="Editar" onclick='abrirModalPelicula({{ p | tojson }})'>✎</button>
+                  <button type="button" title="Editar"
+                          data-pelicula="{{ p | tojson | forceescape }}"
+                          onclick="abrirModalPelicula(JSON.parse(this.dataset.pelicula))">✎</button>
                   <form method="post" action="{{ url_for('vistas.eliminar_pelicula', id_pelicula=p.id_pelicula) }}" style="display:inline;" onsubmit="return confirm('¿Dar de baja esta película?');">
                     <button type="submit" title="Dar de baja">⌫</button>
                   </form>
@@ -87,8 +100,7 @@
               </td>
             </tr>
             {% else %}
-            <!-- Cambiamos el colspan a 7 para que cubra la nueva columna -->
-            <tr><td colspan="7" style="text-align: center; color: #888;">No hay películas registradas.</td></tr>
+            <tr><td colspan="8" style="text-align: center; color: #888;">No hay películas registradas.</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -102,9 +114,9 @@
         <h2 id="movieDialogTitle">Nueva película</h2>
         <button type="button" class="icon-button" onclick="document.getElementById('movieDialog').close()" aria-label="Cerrar">✕</button>
       </div>
-      
+
       <input type="hidden" id="id_pelicula" name="id_pelicula">
-      
+
       <label class="field">
         <span>TÍTULO</span>
         <input id="title" name="title" required placeholder="Nombre de la película"/>
@@ -117,7 +129,7 @@
         <span>SINOPSIS</span>
         <input id="sinopsis" name="sinopsis" placeholder="Breve descripción..."/>
       </label>
-      
+
       <div class="form-two" style="margin-top:10px;">
         <label class="field">
           <span>GÉNERO</span>
@@ -128,7 +140,7 @@
           <input id="duration" name="duration" type="number" min="1" required placeholder="120"/>
         </label>
       </div>
-      
+
       <div class="form-two" style="margin-top:10px;">
         <label class="field">
           <span>CLASIFICACIÓN</span>
@@ -147,7 +159,18 @@
           </select>
         </label>
       </div>
-      
+
+      <div class="form-two" style="margin-top:10px;">
+        <label class="field">
+          <span>DISPONIBLE DESDE</span>
+          <input id="disponible_desde" name="disponible_desde" type="datetime-local" />
+        </label>
+        <label class="field">
+          <span>DISPONIBLE HASTA</span>
+          <input id="disponible_hasta" name="disponible_hasta" type="datetime-local" />
+        </label>
+      </div>
+
       <div class="modal-actions">
         <button type="button" class="button button-ghost" onclick="document.getElementById('movieDialog').close()">Cancelar</button>
         <button type="submit" class="button">Guardar película</button>
@@ -155,21 +178,38 @@
     </form>
   </dialog>
 </section>
+{% endblock %}
 
+{% block scripts %}
 <script>
+function aDatetimeLocal(valor) {
+  if (!valor) return '';
+  return String(valor).replace(' ', 'T').slice(0, 16);
+}
+
+function normalizarClasificacion(valor) {
+  const validas = ['ATP', '+13', '+16', '+18'];
+  if (validas.includes(valor)) return valor;
+  const mapa = { 'G': 'ATP', 'PG': 'ATP', 'PG-13': '+13', 'R': '+16', 'NC-17': '+18' };
+  return mapa[valor] || 'ATP';
+}
+
 function abrirModalPelicula(pelicula = null) {
   const dialog = document.getElementById('movieDialog');
-  document.getElementById('movieDialogTitle').textContent = pelicula ? 'Editar película' : 'Nueva película';
-  
-  document.getElementById('id_pelicula').value = pelicula ? pelicula.id_pelicula : '';
-  document.getElementById('title').value = pelicula ? pelicula.titulo : '';
-  document.getElementById('genre').value = pelicula ? pelicula.genero : '';
-  document.getElementById('duration').value = pelicula ? pelicula.duracion_minutos : '';
-  document.getElementById('rating').value = pelicula ? pelicula.clasificacion : 'ATP';
-  document.getElementById('status').value = (pelicula && !pelicula.activa) ? 'Inactiva' : 'En cartelera';
+  const esEdicion = Boolean(pelicula && pelicula.id_pelicula);
+  document.getElementById('movieDialogTitle').textContent = esEdicion ? 'Editar película' : 'Nueva película';
+
+  document.getElementById('id_pelicula').value = pelicula ? (pelicula.id_pelicula || '') : '';
+  document.getElementById('title').value = pelicula ? (pelicula.titulo || '') : '';
+  document.getElementById('genre').value = pelicula ? (pelicula.genero || '') : '';
+  document.getElementById('duration').value = pelicula ? (pelicula.duracion_minutos || '') : '';
+  document.getElementById('rating').value = pelicula ? normalizarClasificacion(pelicula.clasificacion) : 'ATP';
+  document.getElementById('status').value = (pelicula && pelicula.activa === false) ? 'Inactiva' : 'En cartelera';
   document.getElementById('poster_url').value = pelicula ? (pelicula.poster_url || '') : '';
   document.getElementById('sinopsis').value = pelicula ? (pelicula.sinopsis || '') : '';
-  
+  document.getElementById('disponible_desde').value = pelicula ? aDatetimeLocal(pelicula.disponible_desde) : '';
+  document.getElementById('disponible_hasta').value = pelicula ? aDatetimeLocal(pelicula.disponible_hasta) : '';
+
   dialog.showModal();
 }
 
@@ -182,7 +222,9 @@ function usarExterna(ext) {
     clasificacion: ext.clasificacion,
     activa: true,
     poster_url: ext.poster_url,
-    sinopsis: ext.sinopsis
+    sinopsis: ext.sinopsis,
+    disponible_desde: '',
+    disponible_hasta: ''
   });
 }
 </script>

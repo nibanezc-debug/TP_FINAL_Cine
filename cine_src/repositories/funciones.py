@@ -8,8 +8,8 @@ def buscar_funcion_por_id(id_funcion):
     query = """
         SELECT
             f.id, f.id_pelicula, f.id_sala, f.fecha_hora, f.precio,
-            p.titulo, p.sinopsis, p.poster_url, p.duracion_minutos, p.clasificacion,
-            s.nombre AS sala, s.id_local, l.nombre AS local
+            p.titulo, p.sinopsis, p.poster_url, p.duracion_minutos, p.clasificacion, 
+            s.nombre AS sala, s.capacidad, s.formato, s.id_local, l.nombre AS local
         FROM funciones f
         JOIN peliculas p ON p.id_pelicula = f.id_pelicula
         JOIN salas s ON s.id = f.id_sala
@@ -27,7 +27,7 @@ def listar_funciones(
         SELECT
             f.id, f.id_pelicula, f.id_sala, f.fecha_hora, f.precio,
             p.titulo, p.sinopsis, p.poster_url, p.duracion_minutos, p.clasificacion,
-            s.nombre AS sala, s.id_local, l.nombre AS local
+            s.nombre AS sala, s.capacidad, s.formato, s.id_local, l.nombre AS local
         FROM funciones f
         JOIN peliculas p ON p.id_pelicula = f.id_pelicula
         JOIN salas s ON s.id = f.id_sala
@@ -146,3 +146,14 @@ def modificar_funcion(id_funcion, datos):
 def eliminar_funcion(id_funcion):
     _, filas = ejecutar("DELETE FROM funciones WHERE id = %s", (id_funcion,))
     return filas > 0
+
+def listar_salas():
+    query = """
+        SELECT
+            s.id, s.nombre, s.capacidad, s.formato,
+            s.id_local, l.nombre AS local, l.direccion
+        FROM salas s
+        JOIN locales l ON l.id = s.id_local
+        ORDER BY l.id, s.id
+    """
+    return consultar_todos(query)

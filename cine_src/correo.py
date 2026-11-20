@@ -22,10 +22,13 @@ def _configurar_mensaje(destinatario: dict, asunto: str) -> EmailMessage:
     return mensaje
 
 def _enviar(mensaje: EmailMessage) -> None:
+    if not os.getenv('SMTP_USER') or not os.getenv('SMTP_PASSWORD'):
+        print(f"[AVISO] Mail omitido (sin credenciales SMTP): {mensaje['Subject']} -> {mensaje['To']}")
+        return
+
     try:
         with _conectar(os.getenv('SMTP_HOST'), int(os.getenv('SMTP_PORT', '587'))) as conexion:
-            if os.getenv('SMTP_USER'):
-                conexion.login(os.getenv('SMTP_USER'), os.getenv('SMTP_PASSWORD', ''))
+            conexion.login(os.getenv('SMTP_USER'), os.getenv('SMTP_PASSWORD', ''))
             conexion.send_message(mensaje)
     except (smtplib.SMTPException, OSError):
         raise ApiError('No se pudo enviar el mail', 502)

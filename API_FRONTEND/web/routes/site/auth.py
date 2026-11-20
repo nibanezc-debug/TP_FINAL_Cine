@@ -53,7 +53,7 @@ def registro():
 
     try:
         llamar_api("POST", "/auth/register", json={"nombre": nombre, "email": email, "password": password})
-        flash("Cuenta creada con éxito. Ya podés iniciar sesión.")
+        flash("Cuenta creada con éxito. Ya podés iniciar sesión.", "exito")
         return redirect(url_for("auth.login"))
     except HTTPException as e:
         flash(f"Error al registrarse: {e.description}")

@@ -43,11 +43,20 @@ def gestion():
 
     return render_template("gestion.html", active_page="gestion", peliculas=peliculas, externas=externas)
 
+def _normalizar_fecha_form(valor):
+    texto = (valor or "").strip()
+    if not texto:
+        return None
+    if len(texto) == 16 and "T" in texto:
+        return texto.replace("T", " ") + ":00"
+    return texto
+
+
 @vistas_bp.route("/gestion/pelicula/guardar", methods=["POST"])
 def guardar_pelicula():
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
-    
+
     pelicula_id = request.form.get("id_pelicula")
     payload = {
         "titulo": request.form.get("title"),
@@ -56,16 +65,18 @@ def guardar_pelicula():
         "clasificacion": request.form.get("rating"),
         "activa": request.form.get("status") != "Inactiva",
         "sinopsis": request.form.get("sinopsis", ""),
-        "poster_url": request.form.get("poster_url", "")
+        "poster_url": request.form.get("poster_url", ""),
+        "disponible_desde": _normalizar_fecha_form(request.form.get("disponible_desde")),
+        "disponible_hasta": _normalizar_fecha_form(request.form.get("disponible_hasta")),
     }
 
     try:
         if pelicula_id:
             llamar_api("PUT", f"/peliculas/{pelicula_id}", json=payload)
-            flash("Película actualizada con éxito.")
+            flash("Película actualizada con éxito.", "exito")
         else:
             llamar_api("POST", "/peliculas", json=payload)
-            flash("Película creada con éxito.")
+            flash("Película creada con éxito.", "exito")
     except HTTPException as e:
         flash(f"Error al guardar: {e.description}")
 
@@ -75,22 +86,22 @@ def guardar_pelicula():
 def eliminar_pelicula(id_pelicula):
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
-    
+
     try:
-        llamar_api("DELETE", f"/peliculas/{id_pelicula}", cookies=session.get("api_cookies"))
-        flash("Película dada de baja.")
+        llamar_api("DELETE", f"/peliculas/{id_pelicula}")
+        flash("Película dada de baja.", "exito")
     except HTTPException as e:
         flash(f"Error al eliminar: {e.description}")
-        
+
     return redirect(url_for("vistas.gestion"))
 
 @vistas_bp.route("/dashboard")
 def dashboard():
-
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
 
     ocupacion = []
+    ocupacion_pelicula = []
     ventas_genero = []
     franjas_horarias = []
     cancelaciones = []
@@ -98,63 +109,58 @@ def dashboard():
 
     try:
         ocupacion, _ = llamar_api(
-            "GET", "/entradas/estadisticas/ocupacion"
+            "GET", "/entradas/estadisticas/ocupacion?agrupar=funcion"
         )
-
+        ocupacion_pelicula, _ = llamar_api(
+            "GET", "/entradas/estadisticas/ocupacion?agrupar=pelicula"
+        )
         ventas_genero, _ = llamar_api(
             "GET", "/entradas/estadisticas/ventas-genero"
         )
-
         franjas_horarias, _ = llamar_api(
             "GET", "/entradas/estadisticas/franjas-horarias"
         )
-
         cancelaciones, _ = llamar_api(
             "GET", "/entradas/estadisticas/cancelaciones"
         )
-
         funciones, _ = llamar_api(
             "GET", "/funciones"
         )
-
-    except HTTPException as error:
+    except HTTPException:
         flash("No se pudieron cargar las estadísticas")
         ocupacion = []
+        ocupacion_pelicula = []
         ventas_genero = []
         franjas_horarias = []
         cancelaciones = []
         funciones = []
-#calculo todo para despues usar en el front
-    total_entradas = 0
-    importe_entradas = 0
 
+    total_entradas = 0
+    importe_entradas = 0.0
     for genero in ventas_genero:
-        total_entradas += genero["entradas"]
-        importe_entradas += genero["recaudado"]
+        total_entradas += int(genero.get("entradas") or 0)
+        importe_entradas += float(genero.get("recaudado") or 0)
+    importe_entradas = round(importe_entradas, 2)
 
     total_vendidas = 0
     capacidad_total = 0
-
     for funcion in ocupacion:
-        total_vendidas += funcion["vendidas"]
-        capacidad_total += funcion["capacidad"]
+        total_vendidas += int(funcion.get("vendidas") or 0)
+        capacidad_total += int(funcion.get("capacidad") or 0)
 
     porcentaje_ocupacion = 0
-
     if capacidad_total > 0:
-        porcentaje_ocupacion = round(
-            total_vendidas * 100 / capacidad_total, 1
-        )
+        porcentaje_ocupacion = round(total_vendidas * 100 / capacidad_total, 1)
 
     total_cancelaciones = 0
-
     for fila in cancelaciones:
-        total_cancelaciones += fila["cancelaciones"]
+        total_cancelaciones += int(fila.get("cancelaciones") or 0)
 
     return render_template(
         "dashboard.html",
         active_page="dashboard",
         ocupacion=ocupacion,
+        ocupacion_pelicula=ocupacion_pelicula,
         ventas_genero=ventas_genero,
         franjas_horarias=franjas_horarias,
         cancelaciones=cancelaciones,
@@ -162,9 +168,8 @@ def dashboard():
         total_entradas=total_entradas,
         importe_entradas=importe_entradas,
         porcentaje_ocupacion=porcentaje_ocupacion,
-        total_cancelaciones=total_cancelaciones
+        total_cancelaciones=total_cancelaciones,
     )
-
 
 
 @vistas_bp.route("/gestion/qr", methods=["GET", "POST"])
@@ -191,7 +196,7 @@ def validar_qr():
             )
 
             if resultado.get("valida"):
-                flash("Entrada válida. Ingreso autorizado.")
+                flash("Entrada válida. Ingreso autorizado.", "exito")
 
         except HTTPException as error:
             flash("No se pudo validar la entrada: " + error.description)

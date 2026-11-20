@@ -41,7 +41,7 @@ def _validar_fecha_hora(valor: str, nombre: str) -> str:
         raise ApiError(f'El campo {nombre} debe ser texto', 400)
     
     valor_limpio = valor.strip()
-    formatos = ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d')
+    formatos = ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M', '%Y-%m-%d')
     indice = 0
     encontrado = False
     

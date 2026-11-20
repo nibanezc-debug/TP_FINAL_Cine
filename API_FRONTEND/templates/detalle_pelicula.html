@@ -36,10 +36,22 @@
 
     <div class="showtime-cards">
       {% for f in funciones %}
+        {% set fh = (f.fecha_hora or '') | string | replace('T', ' ') %}
+        {% set fecha_iso = fh[:10] %}
+        {% set partes = fecha_iso.split('-') %}
+        {% set fecha_legible = (partes[2] ~ '/' ~ partes[1] ~ '/' ~ partes[0]) if partes | length == 3 else fecha_iso %}
+        {% set hora_legible = fh[11:16] %}
+
         <label class="showtime-card">
-          <input type="radio" name="id_funcion" value="{{ f.id_funcion or f.id }}" required />
-          <strong class="showtime-hour">{{ f.fecha_hora }}</strong>
+          <div class="showtime-card-top">
+            <input type="radio" name="id_funcion" value="{{ f.id_funcion or f.id }}" required />
+            <span class="showtime-date">{{ fecha_legible }}</span>
+          </div>
+          <strong class="showtime-hour">{{ hora_legible }} hs</strong>
           <span class="muted small">{{ f.sala | default('Sala') }} · ${{ f.precio }}</span>
+          {% if f.local %}
+            <span class="muted small">{{ f.local }}</span>
+          {% endif %}
         </label>
       {% else %}
         {% if filtros %}
