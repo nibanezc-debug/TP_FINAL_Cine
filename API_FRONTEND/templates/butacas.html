@@ -13,28 +13,7 @@
         {% block capacidad_sala %}Capacidad estándar{% endblock %}
       </p>
     </div>
-<<<<<<< HEAD
     <span class="pill">{{ funcion.clasificacion | default('404') }}</span>
-=======
-    <span class="pill">{{ funcion.clasificacion | default('ATP') }}</span>
-  </div>
-
-<div class="showtime-row">
-    <div>
-      <span class="eyebrow">FUNCIÓN SELECCIONADA</span>
-      <p class="muted small">
-        {{ funcion.titulo | default('Película') }}
-        {% if funcion.fecha_hora %}
-          · {{ funcion.fecha_hora[8:10] }}/{{ funcion.fecha_hora[5:7] }}/{{ funcion.fecha_hora[:4] }}
-        {% endif %}
-      </p>
-    </div>
-    {% if funcion.fecha_hora %}
-    <div class="showtimes">
-      <span class="time-button selected">{{ funcion.fecha_hora[11:16] }} hs</span>
-    </div>
-    {% endif %}
->>>>>>> d9def23af05b3ae779105e3b7e32c77649c8bee7
   </div>
 
   <div class="panel seat-panel">

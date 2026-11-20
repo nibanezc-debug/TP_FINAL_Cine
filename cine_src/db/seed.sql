@@ -65,12 +65,12 @@ WHERE s.capacidad = 450
 ORDER BY s.id, f.fila, c.n;
 
 INSERT INTO peliculas
-  (titulo, sinopsis, duracion_minutos, clasificacion, genero, disponible_desde, disponible_hasta, activa)
+  (titulo, sinopsis, poster_url, duracion_minutos, clasificacion, genero, disponible_desde, disponible_hasta, activa)
 VALUES
-  ('The Matrix', 'Un programador descubre que la realidad es una simulación.', 136, 'R', 'Action, Sci-Fi', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1),
-  ('Inception', 'Un ladrón entra en los sueños para robar secretos.', 148, 'PG-13', 'Action, Sci-Fi', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1),
-  ('Toy Story', 'Los juguetes de un niño cobran vida cuando nadie mira.', 81, 'G', 'Animation, Comedy', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1),
-  ('Casablanca', 'Un dueño de bar debe elegir entre el amor y la virtud.', 102, 'PG', 'Drama, Romance', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1);
+  ('The Matrix', 'Un programador descubre que la realidad es una simulación.', 'https://www.themoviedb.org/t/p/w600_and_h900_face/8rT9kG2EYkZpJmYCuTJNnPDEube.jpg', 136, 'R', 'Action, Sci-Fi', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1),
+  ('Inception', 'Un ladrón entra en los sueños para robar secretos.', 'https://www.themoviedb.org/t/p/w600_and_h900_face/tXQvtRWfkUUnWJAn2tN3jERIUG.jpg', 148, 'PG-13', 'Action, Sci-Fi', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1),
+  ('Toy Story', 'Los juguetes de un niño cobran vida cuando nadie mira.', 'https://www.themoviedb.org/t/p/w600_and_h900_face/jvn7wy3RSNEXnFSXLpH2of2LcV6.jpg', 81, 'G', 'Animation, Comedy', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1),
+  ('Casablanca', 'Un dueño de bar debe elegir entre el amor y la virtud.', 'https://www.themoviedb.org/t/p/w600_and_h900_face/a7EjycGNSYw6QqJqDooD9eQGZ4r.jpg', 102, 'PG', 'Drama, Romance', '2026-11-01 00:00:00', '2026-12-31 23:59:59', 1);
 
 -- Funciones con fechas relativas a hoy, para que "Hoy/Mañana" siempre tenga datos
 INSERT INTO funciones (id_sala, id_pelicula, fecha_hora, precio) VALUES

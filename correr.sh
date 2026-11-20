@@ -8,14 +8,9 @@ echo "========================================="
 echo ":popcorn: INICIANDO CINE PARADISO..."
 echo "========================================="
 
-<<<<<<< HEAD
-# 1. Variables de entorno desde .env (ese archivo NO se sube a Git)
-if [ ! -f .env ]; then
-  echo ":x: Falta el archivo .env" >&2
-=======
+
 if [ ! -f .env ]; then
   echo ":x: Falta el archivo .env (copiá .env.example a .env)." >&2
->>>>>>> d9def23af05b3ae779105e3b7e32c77649c8bee7
   exit 1
 fi
 set -a
