@@ -133,12 +133,7 @@ def vista_entradas():
     return render_template("mis_entradas.html", active_page="entradas", entradas=entradas)
 
 
-@entradas_bp.route("/entradas/<int:id_entrada>")
-def vista_entrada(id_entrada):
-    if not session.get("usuario_id"):
-        flash("Iniciá sesión para ver tus entradas.")
-        return redirect(url_for("vistas.cartelera"))
-
+def cargar_entrada(id_entrada):
     # Si la entrada no existe (404) o es de otro usuario (403), llamar_api muestra la página de error
     entrada, _ = llamar_api("GET", f"/entradas/{id_entrada}")
     funcion, _ = llamar_api("GET", f"/funciones/{entrada['id_funcion']}")
@@ -149,6 +144,16 @@ def vista_entrada(id_entrada):
     for b in butacas or []:
         if b["id"] == entrada["id_butaca"]:
             butaca = f"{b['fila']}{b['columna']}"
+    return entrada, funcion, butaca
+
+
+@entradas_bp.route("/entradas/<int:id_entrada>")
+def vista_entrada(id_entrada):
+    if not session.get("usuario_id"):
+        flash("Iniciá sesión para ver tus entradas.")
+        return redirect(url_for("vistas.cartelera"))
+
+    entrada, funcion, butaca = cargar_entrada(id_entrada)
 
     # El QR solo existe para entradas activas; el backend lo arma con el código guardado
     qr_data = None
@@ -163,6 +168,23 @@ def vista_entrada(id_entrada):
         funcion=funcion,
         butaca=butaca,
         qr_data=qr_data,
+    )
+
+
+@entradas_bp.route("/entradas/<int:id_entrada>/cancelar", methods=["GET"])
+def confirmar_cancelacion(id_entrada):
+    # Pantalla a la que llega el botón del correo. Solo muestra la entrada: cancelar es el POST de abajo.
+    if not session.get("usuario_id"):
+        flash("Iniciá sesión para cancelar tu entrada.")
+        return redirect(url_for("auth.login", next=request.path))
+
+    entrada, funcion, butaca = cargar_entrada(id_entrada)
+    return render_template(
+        "cancelar_entrada.html",
+        active_page="entradas",
+        entrada=entrada,
+        funcion=funcion,
+        butaca=butaca,
     )
 
 
