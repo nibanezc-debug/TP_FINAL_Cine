@@ -69,10 +69,16 @@ FLASK_SECRET_KEY="$FRONT_SECRET_KEY" API_URL="http://127.0.0.1:5000/api" python3
 FRONTEND_PID=$!
 cd ..
 
+# Limpieza garantizada con Ctrl+C o si el túnel falla
+trap 'trap - INT TERM EXIT; echo; echo "Apagando servidores..."; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true; exit' INT TERM EXIT
+
+sleep 1
+
 echo "========================================="
-echo ":white_check_mark: ¡SISTEMA ONLINE! :point_right: http://127.0.0.1:5001"
+echo ":white_check_mark: ¡SISTEMA ONLINE!"
+echo ":computer: Local:   http://127.0.0.1:5001"
+echo ":iphone: Celular: Abriendo túnel HTTPS..."
 echo ":octagonal_sign: Presioná Ctrl+C para apagar todo."
 echo "========================================="
 
-trap 'echo; echo "Apagando servidores..."; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true; exit' INT TERM
-wait
+cloudflared tunnel --url http://127.0.0.1:5001

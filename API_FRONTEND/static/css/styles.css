@@ -493,14 +493,20 @@ button {
 
 .seat-panel {
   padding: 25px;
+}
+
+.seat-scroll-wrap {
+  width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 12px;
 }
 
 .seat-map {
   display: grid;
   gap: 6px;
-  justify-content: center;
-  margin: 20px 0;
+  width: max-content;
+  margin: 20px auto;
 }
 
 .seat-map-120 {
@@ -529,7 +535,9 @@ button {
 
 .seat {
   width: 100%;
-  aspect-ratio: 1.05;
+  aspect-ratio: 1 / 1;
+  padding: 0;  
+  min-width: 0;
   border: 0;
   border-radius: 5px;
   background: #dedede;
@@ -1701,8 +1709,6 @@ button {
   .page-heading { align-items: start; flex-direction: column; }
   .showtime-row { align-items: start; flex-direction: column; gap: 12px; }
   .showtimes { flex-wrap: wrap; }
-  .seat-map { grid-template-columns: repeat(14, minmax(13px, 1fr)); gap: 5px 4px; }
-  .seat { font-size: 6px; }
   .seat-footer { gap: 10px; flex-wrap: wrap; }
   .seat-footer > div:first-child { flex-basis: 100%; }
   .checkout-layout { grid-template-columns: minmax(0, 1fr); }

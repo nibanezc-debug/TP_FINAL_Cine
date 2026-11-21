@@ -27,8 +27,9 @@
       <span>P A N T A L L A</span>
     </div>
 
-    {# Acá cada template hijo inserta su grilla hardcodeada #}
-    {% block mapa_butacas %}{% endblock %}
+    <div class="seat-scroll-wrap">
+      {% block mapa_butacas %}{% endblock %}
+    </div>
 
     <div class="legend">
       <span><i class="legend-seat available"></i> Disponible</span>
