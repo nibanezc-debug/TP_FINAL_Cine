@@ -7,13 +7,11 @@ funciones_bp = Blueprint("funciones", __name__)
 
 
 @funciones_bp.get("/cartelera")
-@requiere_usuario
 def listar_cartelera():
     return jsonify(servicio.listar_cartelera(request.args)), 200
 
 
 @funciones_bp.get("/funciones")
-@requiere_usuario
 def listar_funciones():
     return jsonify(servicio.listar_funciones(request.args)), 200
 
@@ -43,3 +41,8 @@ def modificar_funcion(id_funcion):
 def eliminar_funcion(id_funcion):
     servicio.eliminar_funcion(id_funcion)
     return "", 204
+
+@funciones_bp.get("/salas")
+@requiere_admin
+def listar_salas():
+    return jsonify(servicio.listar_salas()), 200

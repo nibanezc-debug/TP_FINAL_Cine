@@ -27,6 +27,7 @@ def crear_app():
     app.register_blueprint(peliculas_bp, url_prefix='/api')
     app.register_blueprint(usuarios_bp, url_prefix='/api')
     app.register_blueprint(funciones_bp, url_prefix="/api")
+    app.register_blueprint(entradas_bp, url_prefix='/api')
 
     @app.errorhandler(ApiError)
     def manejar_error(error):

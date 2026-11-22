@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Validar entradas | Cine Paradiso{% endblock %}
+
+{% block content %}
+
+<section class="view active">
+
+    <div class="page-heading">
+        <div>
+            <span class="eyebrow">BACKOFFICE · ADMINISTRACIÓN</span>
+            <h1>Validación de entradas</h1>
+            <p class="muted">
+                Verificá las entradas antes de permitir el ingreso.
+            </p>
+        </div>
+    </div>
+
+    <div class="panel">
+
+        <h2>Validar código QR</h2>
+
+        <!-- Visor de cámara (se oculta solo si entrás desde una PC sin cámara) -->
+        <div id="bloque-camara" style="max-width: 360px; margin: 0 auto 1.25rem auto; text-align: center;">
+            <div id="reader" style="border-radius: 8px; overflow: hidden;"></div>
+            <p id="estado-camara" class="muted" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                Apuntá la cámara al QR de la entrada...
+            </p>
+        </div>
+
+        <form id="form-validar-qr" method="POST">
+
+            <label class="field">
+                <span>CÓDIGO QR</span>
+                <input
+                    type="text"
+                    id="codigo_qr"
+                    name="codigo_qr"
+                    placeholder="Ingresá el código de la entrada"
+                    required
+                >
+            </label>
+
+            <div class="modal-actions">
+                <button type="submit" class="button">
+                    Validar entrada
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("form-validar-qr");
+    const inputCodigo = document.getElementById("codigo_qr");
+    const bloqueCamara = document.getElementById("bloque-camara");
+    const estadoCamara = document.getElementById("estado-camara");
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function alEscanear(codigoLeido) {
+      html5QrCode.stop().catch(() => {});
+      inputCodigo.value = codigoLeido.trim();
+      estadoCamara.textContent = "Código leído. Validando...";
+      form.submit();
+    }
+
+    html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 230, height: 230 } },
+      alEscanear
+    ).catch(() => {
+      bloqueCamara.style.display = "none";
+    });
+  });
+</script>
+
+{% endblock %}

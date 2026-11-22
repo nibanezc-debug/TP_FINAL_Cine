@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Servicios adicionales | Cine Paradiso{% endblock %}
+{% block content %}
+<section class="view active">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">CHECKOUT · SERVICIOS ADICIONALES</span>
+      <h1>Reserva #{{ id_reserva }}</h1>
+      <p class="muted">{% if estado == 'pendiente' %}Agregá bebidas y snacks antes de confirmar la compra.{% else %}Estado de la reserva: {{ estado }}. Los consumos ya no se pueden modificar.{% endif %}</p>
+    </div>
+    <a class="button button-ghost" href="{{ url_for('consumos_web.mis_reservas') }}">Mis reservas</a>
+  </div>
+  <div class="checkout-layout">
+    <div class="checkout-main">
+      {% if estado == 'pendiente' %}
+      <div class="panel">
+        <h2>Agregar servicios</h2>
+        <form method="post" action="{{ url_for('consumos_web.agregar_consumo', id_reserva=id_reserva) }}" style="display:grid;gap:14px;margin-top:14px">
+          <input type="hidden" name="csrf_consumos" value="{{ csrf_consumos() }}">
+          <label class="field"><span>SERVICIO</span>
+            <select name="id_servicio" required>
+              {% for servicio in servicios %}
+              <option value="{{ servicio.id }}">{{ servicio.nombre }} — ${{ servicio.precio }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="field"><span>CANTIDAD</span><input type="number" name="cantidad" min="1" max="100" value="1" required></label>
+          <button class="button" type="submit" {% if not servicios %}disabled{% endif %}>Agregar a la reserva</button>
+        </form>
+        {% if not servicios %}<p class="muted">No hay servicios disponibles por ahora.</p>{% endif %}
+      </div>
+      {% endif %}
+      <div class="panel">
+        <h2>Servicios de la reserva</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th>{% if estado == 'pendiente' %}<th>Quitar</th>{% endif %}</tr></thead>
+            <tbody>
+              {% for consumo in consumos %}
+              <tr>
+                <td>{{ consumo.nombre }}</td><td>{{ consumo.cantidad }}</td>
+                <td>${{ consumo.precio_unitario }}</td><td>${{ consumo.subtotal }}</td>
+                {% if estado == 'pendiente' %}
+                <td><form method="post" action="{{ url_for('consumos_web.quitar_consumo', id_reserva=id_reserva, id_consumo=consumo.id) }}">
+                  <input type="hidden" name="csrf_consumos" value="{{ csrf_consumos() }}">
+                  <button type="submit" class="button button-small button-ghost">Quitar</button>
+                </form></td>
+                {% endif %}
+              </tr>
+              {% else %}
+              <tr><td colspan="{% if estado == 'pendiente' %}5{% else %}4{% endif %}" class="muted">No agregaste servicios a esta reserva.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <aside class="panel payment-panel">
+      <span class="eyebrow">RESUMEN DE COMPRA</span>
+      <h2>Total de la reserva</h2>
+      <div class="price-lines">
+        <div><span>Entradas</span><b>${{ total_entradas }}</b></div>
+        <div><span>Servicios</span><b>${{ total_consumos }}</b></div>
+      </div>
+      <div class="grand-total"><span>Total</span><strong>${{ total }}</strong></div>
+      {% if estado == 'pendiente' %}
+      <form method="post" action="{{ url_for('consumos_web.confirmar_compra', id_reserva=id_reserva) }}">
+        <input type="hidden" name="csrf_consumos" value="{{ csrf_consumos() }}">
+        <button type="submit" class="button button-full" onclick="return confirm('¿Confirmar compra y enviar los QR por correo?');">Confirmar compra</button>
+      </form>
+      {% else %}
+      <p class="muted">Reserva {{ estado }}. No se admiten más modificaciones.</p>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

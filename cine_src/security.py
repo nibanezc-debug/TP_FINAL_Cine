@@ -36,3 +36,9 @@ def requiere_admin(funcion):
             raise ApiError('No tenés permisos de administrador', 403)
         return funcion(*args, **kwargs)
     return envoltura
+
+def rol_actual():
+    try:
+        return usuario_actual()['rol']
+    except ApiError:
+        return 'cliente'

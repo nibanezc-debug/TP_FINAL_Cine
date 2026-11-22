@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Cancelar entrada #{{ entrada.id }} | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-cancelar-entrada">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('entradas.vista_entradas') }}">← Volver a mis entradas</a>
+      <span class="eyebrow">CANCELAR ENTRADA #{{ entrada.id }}</span>
+      <h1>¿Querés cancelar esta entrada?</h1>
+    </div>
+  </div>
+  <div class="receipt-wrap">
+    <article class="receipt-card">
+      <div class="receipt-top"></div>
+      <div class="receipt-film">
+        <h2>{{ funcion.titulo }} <span class="pill">{{ entrada.estado | capitalize }}</span></h2>
+        <p class="muted small">{{ funcion.local }} · {{ funcion.sala }}</p>
+        <div class="detail-grid">
+          <span><small>Fecha</small><b>{{ entrada.fecha_hora_funcion[:10] }}</b></span>
+          <span><small>Hora</small><b>{{ entrada.fecha_hora_funcion[11:16] }} hs</b></span>
+          <span><small>Butaca</small><b>{{ butaca }}</b></span>
+          <span><small>Precio</small><b>${{ entrada.precio }}</b></span>
+        </div>
+      </div>
+      <div class="receipt-actions">
+        {% if entrada.estado == 'activa' %}
+        <p class="muted small">Si la cancelás, la butaca queda libre para otra persona. Se puede cancelar hasta 2 horas antes de la función.</p>
+        <form action="{{ url_for('entradas.cancelar_entrada', id_entrada=entrada.id) }}" method="post">
+          <button type="submit" class="button">Sí, cancelar entrada</button>
+        </form>
+        {% else %}
+        <p class="muted small">Esta entrada está {{ entrada.estado }}, por eso ya no se puede cancelar.</p>
+        {% endif %}
+        <a class="button button-ghost" href="{{ url_for('entradas.vista_entrada', id_entrada=entrada.id) }}">No, volver a la entrada</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

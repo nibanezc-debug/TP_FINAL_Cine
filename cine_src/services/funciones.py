@@ -131,3 +131,6 @@ def eliminar_funcion(id_funcion):
     if repositorio.tiene_entradas(id_funcion):
         raise ApiError("No se puede eliminar una función con entradas emitidas", 409)
     repositorio.eliminar_funcion(id_funcion)
+
+def listar_salas():
+    return repositorio.listar_salas()

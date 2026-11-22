@@ -10,32 +10,108 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="{{ url_for('cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
+      <a class="brand" href="{{ url_for('vistas.cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
         <span class="brand-mark">CP</span><span>CINE <b>PARADISO</b></span>
       </a>
-      <nav class="main-nav" aria-label="Navegación principal">
-        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('cartelera') }}">Cartelera</a>
-        <a class="nav-link {% if active_page == 'butacas' %}active{% endif %}" href="{{ url_for('butacas') }}">Butacas</a>
-        <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout') }}">Checkout</a>
-        <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante') }}">Comprobante</a>
-        <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas') }}">Mis entradas</a>
-        <span class="nav-separator"></span>
-        <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('gestion') }}">Staff / Admin</a>
-        <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+
+        <nav class="main-nav" aria-label="Navegación principal">
+        <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('vistas.cartelera') }}">Cartelera</a>
+
+        {% if session.get('carrito') or active_page == 'checkout' %}
+          <a class="nav-link {% if active_page == 'checkout' %}active{% endif %}" href="{{ url_for('checkout.vista_checkout') }}">Checkout</a>
+        {% endif %}
+
+        {% if session.get('compra') or active_page == 'comprobante' %}
+          <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante.vista_comprobante') }}">Comprobante</a>
+        {% endif %}
+
+        {% if session.get('usuario_id') and session.get('rol') == 'cliente' %}
+          <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas.vista_entradas') }}">Mis entradas</a>
+          <a class="nav-link {% if active_page == 'mis_reservas' %}active{% endif %}" href="{{ url_for('consumos_web.mis_reservas') }}">Mis reservas</a>
+          <a class="nav-link {% if active_page == 'perfil' %}active{% endif %}" href="{{ url_for('usuarios_admin.perfil') }}">Mi perfil</a>
+        {% endif %}
+
+        {% if session.get('rol') == 'administrador' %}
+          <span class="nav-separator"></span>
+          <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('vistas.gestion') }}">Staff / Admin</a>
+          <a class="nav-link {% if active_page == 'servicios' %}active{% endif %}" href="{{ url_for('servicios_web.mostrar_servicios') }}">Servicios</a>
+          <a class="nav-link {% if active_page == 'funciones' %}active{% endif %}" href="{{ url_for('funciones_admin.listar_funciones_admin') }}">Funciones</a>
+          <a class="nav-link {% if active_page == 'usuarios' %}active{% endif %}" href="{{ url_for('usuarios_admin.listar_usuarios') }}">Usuarios</a>
+          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('vistas.dashboard') }}">Dashboard</a>
+          <a class="nav-link {% if active_page == 'qr' %}active{% endif %}" href="{{ url_for('vistas.validar_qr') }}">Validar QR</a>
+        {% endif %}
       </nav>
-      <button class="button button-small button-ghost" id="loginBtn" type="button">Iniciar sesión</button>
+
+      {% if session.get('usuario_id') %}
+        <a class="profile-chip" href="{{ url_for('usuarios_admin.perfil') }}" style="text-decoration: none; color: inherit;" title="Ir a mi perfil">
+          <span class="avatar">{{ session.get('email', 'U')[0] | upper }}</span>
+          <span>
+            <b>{{ session.get('email') }}</b>
+            <small>{{ session.get('rol') | capitalize }}</small>
+          </span>
+        </a>
+        <a class="button button-small button-ghost" href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+      {% else %}
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="button button-small button-ghost" id="loginBtn" type="button" onclick="document.getElementById('loginModal').showModal()">
+            Iniciar sesión
+          </button>
+          <a class="button button-small" href="{{ url_for('auth.registro') }}">
+            Registrarse
+          </a>
+        </div>
+      {% endif %}
     </header>
 
     <main>
+      {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+        {% if categoria == 'exito' %}
+        <div class="panel" style="border-color: var(--green); margin-top: 20px; color: var(--green);">
+        {% else %}
+        <div class="panel" style="border-color: var(--red); margin-top: 20px; color: #ff777d;">
+        {% endif %}
+          {{ mensaje }}
+        </div>
+      {% endfor %}
+
       {% block content %}{% endblock %}
     </main>
 
     <footer class="footer">
       <span>© 2026 Cine Paradiso</span>
-      <span>Templates frontend · Hito 2 · Introducción al Desarrollo de Software</span>
+      <span>Hito 3 · Introducción al Desarrollo de Software (FIUBA)</span>
     </footer>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
+
+  <!-- Modal de Login -->
+  {% if not session.get('usuario_id') %}
+  <dialog class="modal" id="loginModal">
+    <div class="modal-head">
+      <h2>Iniciar sesión</h2>
+      <button class="icon-button" type="button" onclick="document.getElementById('loginModal').close()" aria-label="Cerrar">✕</button>
+    </div>
+    <form action="{{ url_for('auth.login') }}" method="post">
+      <div class="field">
+        <span>EMAIL</span>
+        <input type="email" id="email" name="email" placeholder="admin@cineparadiso.com" required />
+      </div>
+      <div class="field">
+        <span>CONTRASEÑA</span>
+        <input type="password" id="password" name="password" placeholder="Tu contraseña" required />
+      </div>
+      <div class="modal-actions">
+        <button class="button button-ghost" type="button" onclick="document.getElementById('loginModal').close()">Cancelar</button>
+        <button class="button" type="submit">Ingresar</button>
+      </div>
+      <p class="muted small" style="margin-top: 12px; text-align: center;">
+        ¿Todavía no tenés cuenta? <a href="{{ url_for('auth.registro') }}">Registrate acá</a>
+      </p>
+    </form>
+  </dialog>
+  {% endif %}
+
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>

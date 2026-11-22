@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Entrada #{{ entrada.id }} | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-entrada">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('entradas.vista_entradas') }}">← Volver a mis entradas</a>
+      <span class="eyebrow">ENTRADA #{{ entrada.id }}</span>
+      <h1>{{ funcion.titulo }}</h1>
+    </div>
+  </div>
+  <div class="receipt-wrap">
+    <article class="receipt-card">
+      <div class="receipt-top"></div>
+      {% if qr_data %}
+      <div class="qr-area">
+        <img class="qr-code" src="{{ qr_data }}" alt="Código QR de la entrada {{ entrada.id }}" />
+        <strong class="mono" style="word-break: break-all; font-size: 0.85em;">{{ entrada.codigo_qr }}</strong>
+        <span class="muted tiny">Código de acceso</span>
+      </div>
+      {% else %}
+      <div class="qr-area">
+        <span class="muted small">Esta entrada está {{ entrada.estado }}, por eso no tiene un QR para mostrar.</span>
+      </div>
+      {% endif %}
+      <div class="receipt-film">
+        <h2>{{ funcion.titulo }} <span class="pill">{{ entrada.estado | capitalize }}</span></h2>
+        <p class="muted small">{{ funcion.local }} · {{ funcion.sala }}</p>
+        <div class="detail-grid">
+          <span><small>Fecha</small><b>{{ entrada.fecha_hora_funcion[:10] }}</b></span>
+          <span><small>Hora</small><b>{{ entrada.fecha_hora_funcion[11:16] }} hs</b></span>
+          <span><small>Butaca</small><b>{{ butaca }}</b></span>
+          <span><small>Precio</small><b>${{ entrada.precio }}</b></span>
+        </div>
+      </div>
+      <div class="receipt-actions">
+        <a class="button button-ghost" href="{{ url_for('entradas.vista_entradas') }}">Volver a mis entradas</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

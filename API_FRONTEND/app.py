@@ -1,52 +1,54 @@
+import os
 from flask import Flask, render_template, redirect, url_for
-# import requests  # Descomentar al conectar con el backend en http://localhost:5000
+from werkzeug.exceptions import HTTPException
+from api_client import CODIGOS_ERROR
 
-app = Flask(__name__)
-API_URL = "http://localhost:5000"
+# Importamos todos los blueprints
+from web.routes.site.butacas import butacas_bp
+from web.routes.site.entradas import checkout_bp, comprobante_bp, entradas_bp
+from web.routes.site.funcion import funcion_bp
+from web.routes.site.funciones_admin import funciones_admin_bp
+from web.routes.site.vistas import vistas_bp 
+from web.routes.site.auth import auth_bp             
+from web.routes.site.usuarios import usuarios_bp
+from web.routes.site.servicios import servicios_web_bp
+from web.routes.site.consumos import consumos_web_bp
 
+def mostrar_error(e):
+    return render_template("error.html", codigo=e.code, mensaje=e.description), e.code
 
-@app.route("/")
-def index():
-    return redirect(url_for("cartelera"))
+def crear_app():
+    app = Flask(__name__)
 
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave_secreta_frontend")
+    if not app.secret_key:
+        raise RuntimeError("Es necesario configurar FLASK_SECRET_KEY")
 
-@app.route("/cartelera")
-def cartelera():
-    # Ejemplo de conexión futura:
-    # resp = requests.get(f"{API_URL}/api/cartelera")
-    # peliculas = resp.json() if resp.status_code == 200 else []
-    return render_template("cartelera.html", active_page="cartelera")
+    app.config["API_URL"] = os.getenv("API_URL", "http://127.0.0.1:5000/api")
+    app.config["SESSION_COOKIE_NAME"] = "cine_front"
 
+    for codigo in CODIGOS_ERROR:
+        app.register_error_handler(codigo, mostrar_error)
 
-@app.route("/butacas")
-def butacas():
-    return render_template("butacas.html", active_page="butacas")
+    @app.route("/")
+    def index():
+        return redirect(url_for("vistas.cartelera"))
+    
+    # Registramos todos los Blueprints
+    app.register_blueprint(butacas_bp)
+    app.register_blueprint(funcion_bp)
+    app.register_blueprint(funciones_admin_bp)
+    app.register_blueprint(vistas_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(usuarios_bp)
+    app.register_blueprint(servicios_web_bp)
+    app.register_blueprint(consumos_web_bp)
+    app.register_blueprint(checkout_bp)
+    app.register_blueprint(comprobante_bp)
+    app.register_blueprint(entradas_bp)
 
-
-@app.route("/checkout")
-def checkout():
-    return render_template("checkout.html", active_page="checkout")
-
-
-@app.route("/comprobante")
-def comprobante():
-    return render_template("comprobante.html", active_page="comprobante")
-
-
-@app.route("/entradas")
-def entradas():
-    return render_template("mis_entradas.html", active_page="entradas")
-
-
-@app.route("/gestion")
-def gestion():
-    return render_template("gestion.html", active_page="gestion")
-
-
-@app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html", active_page="dashboard")
-
+    return app
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app_front = crear_app()
+    app_front.run(host="127.0.0.1", port=5001, debug=True)

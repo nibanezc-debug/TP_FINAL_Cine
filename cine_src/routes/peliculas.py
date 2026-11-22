@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from validators import peliculas as peliculas_validator
 from services import peliculas as peliculas_service
-from security import requiere_admin, requiere_usuario, usuario_actual
+from security import requiere_admin, rol_actual
 
 peliculas_bp = Blueprint("peliculas", __name__)
 
@@ -13,19 +13,15 @@ def get_externas():
     return jsonify({"resultados": lista_omdb}), 200
 
 @peliculas_bp.route("/peliculas", methods=["GET"])
-@requiere_usuario
 def get_peliculas():
     filtros = peliculas_validator.validar_filtros_peliculas(request.args)
-    usuario = usuario_actual()
-    peliculas = peliculas_service.listar_peliculas(filtros, usuario['rol'])
+    peliculas = peliculas_service.listar_peliculas(filtros, rol_actual())
     return jsonify({"peliculas": peliculas}), 200
 
 @peliculas_bp.route("/peliculas/<int:id>", methods=["GET"])
-@requiere_usuario
 def get_pelicula(id):
     peliculas_validator.validar_id(id)
-    usuario = usuario_actual()
-    pelicula = peliculas_service.obtener_pelicula_por_id(id, usuario['rol'])
+    pelicula = peliculas_service.obtener_pelicula_por_id(id, rol_actual())
     return jsonify(pelicula), 200
 
 @peliculas_bp.route("/peliculas", methods=["POST"])

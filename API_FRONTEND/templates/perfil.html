@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil | Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="view active" id="view-perfil">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('vistas.cartelera') }}">← Volver a cartelera</a>
+      <span class="eyebrow">CUENTA PERSONAL</span>
+      <h1>Mi perfil</h1>
+      <p class="muted">Consultá tus datos personales, películas vistas y consumos realizados.</p>
+    </div>
+    <span class="pill">{{ usuario.rol | upper }}</span>
+  </div>
+
+  <div class="panel" style="max-width: 600px; margin-bottom: 24px;">
+    <h2>Datos personales</h2>
+    <form method="POST" action="{{ url_for('usuarios_admin.perfil') }}" style="display: grid; gap: 1rem; margin-top: 14px;">
+      <label class="field">
+        <span>NOMBRE</span>
+        <input type="text" name="nombre" value="{{ usuario.nombre }}" required />
+      </label>
+
+      <label class="field">
+        <span>CORREO ELECTRÓNICO</span>
+        <input type="email" name="email" value="{{ usuario.email }}" required />
+      </label>
+
+      {% if usuario.fecha_registro %}
+      <p class="muted small">Miembro desde: {{ usuario.fecha_registro }}</p>
+      {% endif %}
+
+      <div style="display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+        <button type="submit" class="button">Guardar cambios</button>
+        <a class="button button-ghost" href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+      </div>
+    </form>
+  </div>
+
+  {% if session.get('rol') == 'cliente' %}
+  <div class="panel" style="margin-bottom: 24px;">
+    <span class="eyebrow">HISTORIAL</span>
+    <h2>Películas que vi anteriormente</h2>
+
+    {% if peliculas_vistas %}
+    <div style="display: grid; gap: 14px; margin-top: 16px;">
+      {% for p in peliculas_vistas %}
+      <article style="display: flex; gap: 16px; align-items: center; padding: 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;">
+        {% if p.poster_url %}
+        <img src="{{ p.poster_url }}" alt="{{ p.titulo }}" style="width: 56px; height: 84px; object-fit: cover; border-radius: 6px; flex-shrink: 0;" />
+        {% endif %}
+        <div style="flex: 1;">
+          <h3 style="margin: 0 0 4px;">{{ p.titulo }}</h3>
+          <p class="muted small" style="margin: 0;">
+            {{ p.local }}{% if p.sala %} · {{ p.sala }}{% endif %}
+            {% if p.fecha_hora %} · 📅 {{ p.fecha_hora[:10] }} · 🕘 {{ p.fecha_hora[11:16] }} hs{% endif %}
+          </p>
+        </div>
+        <span class="pill">{{ p.cantidad_entradas }} {% if p.cantidad_entradas == 1 %}entrada{% else %}entradas{% endif %}</span>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted" style="margin-top: 12px;">Todavía no tenés películas vistas registradas. Cuando asistas a una función o se valide tu QR, aparecerá acá.</p>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;">
+      <div>
+        <span class="eyebrow">SERVICIOS ADICIONALES</span>
+        <h2>Mis consumos</h2>
+      </div>
+      {% if consumos_historial %}
+      <strong>Total en consumos: ${{ total_consumos }}</strong>
+      {% endif %}
+    </div>
+
+    <div class="table-wrap" style="margin-top: 14px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Reserva</th>
+            <th>Película</th>
+            <th>Fecha</th>
+            <th>Servicio</th>
+            <th>Cant.</th>
+            <th>Unitario</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in consumos_historial %}
+          <tr>
+            <td>
+              <a href="{{ url_for('consumos_web.mostrar_consumos', id_reserva=c.id_reserva) }}">#{{ c.id_reserva }}</a>
+            </td>
+            <td>{{ c.pelicula }}</td>
+            <td>{{ c.fecha }}</td>
+            <td>{{ c.nombre }}</td>
+            <td>{{ c.cantidad }}</td>
+            <td>${{ c.precio_unitario }}</td>
+            <td><b>${{ c.subtotal }}</b></td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="muted">Todavía no registraste consumos adicionales en tus reservas.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

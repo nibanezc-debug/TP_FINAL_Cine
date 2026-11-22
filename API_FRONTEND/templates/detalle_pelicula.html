@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ pelicula.titulo | default('Detalle de película') }} | Cine Paradiso{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/funciones.css') }}" />
+<section class="view active" id="view-detalle-pelicula">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" href="{{ url_for('vistas.cartelera', **filtros) }}">← Volver a cartelera</a>
+    </div>
+  </div>
+
+  <div class="panel movie-hero">
+    <div class="movie-poster-box">
+      {% if pelicula.poster_url %}
+        <img src="{{ pelicula.poster_url }}" alt="Póster de {{ pelicula.titulo }}" />
+      {% endif %}
+    </div>
+
+    <div class="movie-info-box">
+      <div class="movie-meta">
+        {% if pelicula.clasificacion %}<span class="pill">{{ pelicula.clasificacion }}</span>{% endif %}
+        {% if pelicula.genero %}<span class="muted small">{{ pelicula.genero }}</span>{% endif %}
+        {% if pelicula.duracion_minutos %}<span class="muted small">· {{ pelicula.duracion_minutos }} min</span>{% endif %}
+      </div>
+
+      <h1>{{ pelicula.titulo }}</h1>
+      <p class="movie-synopsis">{{ pelicula.sinopsis or 'Sin sinopsis disponible.' }}</p>
+    </div>
+  </div>
+
+
+  <form method="POST" class="panel showtime-selector-panel">
+    <span class="eyebrow">FUNCIONES DISPONIBLES</span>
+    <h2>Elegí un horario</h2>
+
+    <div class="showtime-cards">
+      {% for f in funciones %}
+        {% set fh = (f.fecha_hora or '') | string | replace('T', ' ') %}
+        {% set fecha_iso = fh[:10] %}
+        {% set partes = fecha_iso.split('-') %}
+        {% set fecha_legible = (partes[2] ~ '/' ~ partes[1] ~ '/' ~ partes[0]) if partes | length == 3 else fecha_iso %}
+        {% set hora_legible = fh[11:16] %}
+
+        <label class="showtime-card">
+          <div class="showtime-card-top">
+            <input type="radio" name="id_funcion" value="{{ f.id_funcion or f.id }}" required />
+            <span class="showtime-date">{{ fecha_legible }}</span>
+          </div>
+          <strong class="showtime-hour">{{ hora_legible }} hs</strong>
+          <span class="muted small">{{ f.sala | default('Sala') }} · ${{ f.precio }}</span>
+          {% if f.local %}
+            <span class="muted small">{{ f.local }}</span>
+          {% endif %}
+        </label>
+      {% else %}
+        {% if filtros %}
+          <p class="muted">No hay funciones de esta película para los filtros elegidos.
+            <a href="{{ url_for('funcion.get_funciones', id_pelicula=pelicula.id_pelicula) }}">Ver todos los horarios</a></p>
+        {% else %}
+          <p class="muted">No hay funciones programadas para esta película.</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if funciones %}
+    <div class="bottom-right-action">
+      <button type="submit" id="btnElegirButacas" class="button" disabled>
+        COMPRAR · Elegir butacas →
+      </button>
+    </div>
+    {% endif %}
+  </form>
+</section>
+
+<script>
+  document.querySelectorAll('input[name="id_funcion"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.getElementById('btnElegirButacas').disabled = false;
+    });
+  });
+</script>
+{% endblock %}
