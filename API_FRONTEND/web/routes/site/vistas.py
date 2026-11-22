@@ -174,36 +174,24 @@ def dashboard():
 
 @vistas_bp.route("/gestion/qr", methods=["GET", "POST"])
 def validar_qr():
-
     if session.get("rol") != "administrador":
-        return redirect(url_for("vistas.cartelera"))
+        abort(403, description="No tenés permisos de administrador")
 
     if request.method == "POST":
+        codigo_qr = (request.form.get("codigo_qr") or "").strip()
+        if not codigo_qr:
+            flash("Ingresá o escaneá un código QR.", "error")
+            return redirect(url_for("vistas.validar_qr"))
 
-        codigo_qr = request.form.get("codigo_qr", "").strip()
-        id_funcion = request.form.get("id_funcion", type=int)
-
-        datos = {
-            "codigo_qr": codigo_qr,
-            "id_funcion": id_funcion
-        }
-
-        try:
-            resultado, _ = llamar_api(
-                "POST",
-                "/entradas/validar",
-                json=datos
-            )
-
-            if resultado.get("valida"):
-                flash("Entrada válida. Ingreso autorizado.", "exito")
-
-        except HTTPException as error:
-            flash("No se pudo validar la entrada: " + error.description)
-
+        datos, _ = llamar_api(
+            "POST",
+            "/entradas/validar",
+            json={"codigo_qr": codigo_qr},
+        )
+        flash(
+            f"Entrada #{datos['id']} válida — Función #{datos['id_funcion']}, Butaca #{datos['id_butaca']}.",
+            "exito",
+        )
         return redirect(url_for("vistas.validar_qr"))
 
-    return render_template(
-        "qr.html",
-        active_page="qr"
-    )
+    return render_template("qr.html", active_page="qr")
