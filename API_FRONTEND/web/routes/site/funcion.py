@@ -31,7 +31,6 @@ def consultar_cartelera(filtros):
         # con_sesion=False asegura que no exija estar logueado
         peliculas, _ = llamar_api("GET", "/cartelera", params=filtros, con_sesion=False)
     except HTTPException as error:
-        # Si el backend sigue exigiendo sesión por error de otro compañero, atajamos la caída
         if error.code == 401:
             return []
         raise
@@ -46,7 +45,6 @@ def get_funciones(id_pelicula):
     if request.method == "POST":
         id_funcion = request.form.get("id_funcion", "")
         if id_funcion.isdigit():
-            # Acá el usuario eligió horario. Si no está logueado, podríamos frenarlo acá
             if not session.get("usuario_id"):
                 flash("Por favor, iniciá sesión para comprar butacas.")
                 return redirect(url_for("vistas.cartelera"))
@@ -65,7 +63,6 @@ def get_funciones(id_pelicula):
 
     if pelicula is None:
         try:
-            # con_sesion=False para que el invitado pueda ver la info de la peli
             pelicula, _ = llamar_api("GET", f"/peliculas/{id_pelicula}", con_sesion=False)
             pelicula["funciones"] = []
         except HTTPException:

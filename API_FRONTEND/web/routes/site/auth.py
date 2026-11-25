@@ -25,13 +25,7 @@ def login():
     destino = destino_seguro(request.form.get("next"))
 
     try:
-        try:
-            datos, resp = llamar_api("POST", "/usuarios/login", json={"email": email, "password": password})
-        except HTTPException as e:
-            if e.code == 404:
-                datos, resp = llamar_api("POST", "/auth/login", json={"email": email, "password": password})
-            else:
-                raise e
+        datos, resp = llamar_api("POST", "/auth/login", json={"email": email, "password": password})
     except HTTPException as e:
         flash(f"Error al iniciar sesión: {e.description}")
         return redirect(url_for("auth.login", next=destino))

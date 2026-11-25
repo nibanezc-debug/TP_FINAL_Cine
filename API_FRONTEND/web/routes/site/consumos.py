@@ -1,4 +1,3 @@
-"""Sección de consumos para clientes, integrada con el checkout del grupo."""
 import hmac
 import secrets
 

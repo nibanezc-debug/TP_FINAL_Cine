@@ -91,8 +91,8 @@ def vista_comprobante():
         if factura is None:
             factura, _ = llamar_api("GET", f"/entradas/{id_entrada}/factura")
 
-        butaca_label = mapa_butacas.get(entrada["id_butaca"], f"#{entrada['id_butaca']}")
-        entradas.append({**entrada, "qr_data": qr_data, "butaca_label": butaca_label})
+        butaca_etiqueta = mapa_butacas.get(entrada["id_butaca"], f"#{entrada['id_butaca']}")
+        entradas.append({**entrada, "qr_data": qr_data, "butaca_label": butaca_etiqueta})
 
     session.pop("compra", None)
     return render_template(

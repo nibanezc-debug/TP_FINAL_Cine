@@ -13,7 +13,7 @@ TEMPLATES_POR_CAPACIDAD = {
 @butacas_bp.route("/cartelera/funcion/<int:id>/butacas", methods=["GET"])
 def vista_butacas(id):
     # llamar_api devuelve la tupla (datos, resp); si hay error en el backend hace abort() solo
-    butacas, _ = llamar_api("GET", f"/funciones/{id}/butacas", con_sesion=False)
+    butacas, _ = llamar_api("GET", f"/funciones/{id}/butacas")
     funcion, _ = llamar_api("GET", f"/funciones/{id}")
 
     butacas = butacas or []
@@ -31,16 +31,16 @@ def vista_butacas(id):
 
 @butacas_bp.route("/funcion/<int:id_funcion>/butacas", methods=["POST"])
 def seleccionar_butacas(id_funcion):
-    ids_raw = request.form.get("butacas_ids", "")
-    labels = request.form.get("butacas_labels", "")
+    ids_crudo = request.form.get("butacas_ids", "")
+    etiquetas = request.form.get("butacas_labels", "")
 
-    butacas_ids = [int(x) for x in ids_raw.split(",") if x.isdigit()]
+    butacas_ids = [int(x) for x in ids_crudo.split(",") if x.isdigit()]
     if not butacas_ids:
         return redirect(url_for("butacas.vista_butacas", id=id_funcion))
 
     session["carrito"] = {
         "id_funcion": id_funcion,
         "butacas_ids": butacas_ids,
-        "butacas_labels": labels,
+        "butacas_labels": etiquetas,
     }
-    return redirect(url_for("checkout.vista_checkout"))  # Ajustar al nombre de tu blueprint de checkout
+    return redirect(url_for("checkout.vista_checkout"))

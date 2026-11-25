@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 from repositories import salas as repositories
 from services import salas as services
 from security import requiere_admin
@@ -13,37 +13,6 @@ def get_salas_por_local(id_local):
     respuesta = services.obtener_salas_por_local_paginado(id_local, request.args)
     return jsonify(respuesta), 200
 
-
-@salas_bp.route('/locales/<int:id_local>/salas', methods=['POST'])
-@requiere_admin
-def post_sala_por_local(id_local):
-    if repositories.buscar_local_por_id(id_local) is None:
-        return jsonify({'error': 'Local no encontrado'}), 404
-
-    data = request.get_json(silent=True) or {}
-
-    es_valido, mensaje, codigo = services.validar_data_salas(data)
-    if not es_valido:    
-        return jsonify(mensaje), codigo
-
-    repositories.agregar_sala(data, id_local)
-    return jsonify({'message': 'Sala agregada exitosamente'}), 201
-
-
-@salas_bp.route('/salas/<int:id_sala>', methods=['PATCH'])
-@requiere_admin
-def patch_sala_por_local(id_sala): 
-    if repositories.buscar_sala_por_id(id_sala) is None:
-        return jsonify({'error': 'no existe esta sala'}), 404
-    
-    data = request.get_json(silent=True) or {}
-
-    es_valido, mensaje, codigo = services.validar_data_salas(data, es_patch=True)
-    if not es_valido:
-        return jsonify(mensaje), codigo
-
-    repositories.actualizar_sala(data, id_sala)
-    return '', 204
 
 
 @salas_bp.route('/salas/<int:id_sala>', methods=['DELETE'])
