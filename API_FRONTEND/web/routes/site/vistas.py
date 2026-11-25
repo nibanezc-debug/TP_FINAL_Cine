@@ -24,14 +24,14 @@ def gestion():
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
     
-    # 1. Obtener las películas para llenar la tabla del administrador
+    # Obtener las películas para llenar la tabla del administrador
     try:
         datos, _ = llamar_api("GET", "/peliculas")
         peliculas = (datos or {}).get("peliculas", [])
     except Exception:
         peliculas = []
     
-    # 2. Manejar la búsqueda externa en OMDb
+    # Manejar la búsqueda externa en OMDb
     titulo_busqueda = request.args.get("titulo_omdb")
     externas = []
     if titulo_busqueda:
