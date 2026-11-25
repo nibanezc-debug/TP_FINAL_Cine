@@ -209,11 +209,7 @@ def validar_qr():
         )
         return redirect(url_for("vistas.validar_qr"))
 
-<<<<<<< HEAD
     return render_template(
         "qr.html",
         active_page="qr"
     )
-=======
-    return render_template("qr.html", active_page="qr")
->>>>>>> 82983bd4372a8c572d872243a5a00b72b568a0da
