@@ -5,6 +5,8 @@ from web.routes.site.funcion import leer_filtros, consultar_cartelera
 
 vistas_bp = Blueprint("vistas", __name__)
 
+
+# Cartelera pública
 @vistas_bp.route("/cartelera")
 def cartelera():
     filtros = leer_filtros()
@@ -19,19 +21,21 @@ def cartelera():
         filtros=filtros
     )
 
+
+# Gestión de películas
 @vistas_bp.route("/gestion")
 def gestion():
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
     
-    # 1. Obtener las películas para llenar la tabla del administrador
+    # Catálogo interno
     try:
         datos, _ = llamar_api("GET", "/peliculas")
         peliculas = (datos or {}).get("peliculas", [])
     except Exception:
         peliculas = []
     
-    # 2. Manejar la búsqueda externa en OMDb
+    # Búsqueda en OMDb
     titulo_busqueda = request.args.get("titulo_omdb")
     externas = []
     if titulo_busqueda:
@@ -43,6 +47,8 @@ def gestion():
 
     return render_template("gestion.html", active_page="gestion", peliculas=peliculas, externas=externas)
 
+
+# Normaliza fecha datetime-local
 def _normalizar_fecha_form(valor):
     texto = (valor or "").strip()
     if not texto:
@@ -52,6 +58,7 @@ def _normalizar_fecha_form(valor):
     return texto
 
 
+# Alta o edición
 @vistas_bp.route("/gestion/pelicula/guardar", methods=["POST"])
 def guardar_pelicula():
     if session.get("rol") != "administrador":
@@ -82,6 +89,8 @@ def guardar_pelicula():
 
     return redirect(url_for("vistas.gestion"))
 
+
+# Baja de película
 @vistas_bp.route("/gestion/pelicula/eliminar/<int:id_pelicula>", methods=["POST"])
 def eliminar_pelicula(id_pelicula):
     if session.get("rol") != "administrador":
@@ -95,6 +104,8 @@ def eliminar_pelicula(id_pelicula):
 
     return redirect(url_for("vistas.gestion"))
 
+
+# Dashboard de estadísticas
 @vistas_bp.route("/dashboard")
 def dashboard():
     if session.get("rol") != "administrador":
@@ -107,6 +118,7 @@ def dashboard():
     cancelaciones = []
     funciones = []
 
+    # Métricas desde API
     try:
         ocupacion, _ = llamar_api(
             "GET", "/entradas/estadisticas/ocupacion?agrupar=funcion"
@@ -135,6 +147,7 @@ def dashboard():
         cancelaciones = []
         funciones = []
 
+    # Cálculo de KPIs
     total_entradas = 0
     importe_entradas = 0.0
     for genero in ventas_genero:
@@ -172,12 +185,14 @@ def dashboard():
     )
 
 
+# Validación de QR
 @vistas_bp.route("/gestion/qr", methods=["GET", "POST"])
 def validar_qr():
 
     if session.get("rol") != "administrador":
         return redirect(url_for("vistas.cartelera"))
 
+    # Validar código enviado
     if request.method == "POST":
 
         codigo_qr = request.form.get("codigo_qr", "").strip()

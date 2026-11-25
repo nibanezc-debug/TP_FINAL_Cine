@@ -55,14 +55,14 @@ else
 fi
 unset MYSQL_PWD
 
-# 4. Backend
+# Backend
 echo ":arrow_right: Levantando Backend (Puerto 5000)..."
 cd cine_src
 python3 app.py &
 BACKEND_PID=$!
 cd ..
 
-# 5. Frontend (usa su propia clave secreta, distinta de la del backend)
+# Frontend (usa su propia clave secreta, distinta de la del backend)
 echo ":arrow_right: Levantando Frontend (Puerto 5001)..."
 cd API_FRONTEND
 FLASK_SECRET_KEY="$FRONT_SECRET_KEY" API_URL="http://127.0.0.1:5000/api" python3 app.py &
@@ -75,10 +75,16 @@ trap 'trap - INT TERM EXIT; echo; echo "Apagando servidores..."; kill $BACKEND_P
 sleep 1
 
 echo "========================================="
-echo ":white_check_mark: ¡SISTEMA ONLINE!"
-echo ":computer: Local:   http://127.0.0.1:5001"
-echo ":iphone: Celular: Abriendo túnel HTTPS..."
-echo ":octagonal_sign: Presioná Ctrl+C para apagar todo."
-echo "========================================="
-
-cloudflared tunnel --url http://127.0.0.1:5001
+echo "SISTEMA ONLINE"
+echo "Local:   http://127.0.0.1:5001"
+if command -v cloudflared >/dev/null 2>&1; then
+  echo "Celular: Abriendo túnel HTTPS con cloudflared..."
+  echo "Presioná Ctrl+C para apagar todo."
+  echo "========================================="
+  cloudflared tunnel --url http://127.0.0.1:5001
+else
+  echo "Aviso: 'cloudflared' no está instalado; corriendo solo en modo local."
+  echo "Presioná Ctrl+C para apagar todo."
+  echo "========================================="
+  wait
+fi
