@@ -9,12 +9,14 @@
 </head>
 <body>
   <div class="app-shell">
+    <!-- Barra de navegación -->
     <header class="topbar">
       <a class="brand" href="{{ url_for('vistas.cartelera') }}" aria-label="Cine Paradiso, ir a cartelera">
         <span class="brand-mark">CP</span><span>CINE <b>PARADISO</b></span>
       </a>
 
-        <nav class="main-nav" aria-label="Navegación principal">
+      <!-- Enlaces principales -->
+      <nav class="main-nav" aria-label="Navegación principal">
         <a class="nav-link {% if active_page == 'cartelera' %}active{% endif %}" href="{{ url_for('vistas.cartelera') }}">Cartelera</a>
 
         {% if session.get('carrito') or active_page == 'checkout' %}
@@ -25,12 +27,14 @@
           <a class="nav-link {% if active_page == 'comprobante' %}active{% endif %}" href="{{ url_for('comprobante.vista_comprobante') }}">Comprobante</a>
         {% endif %}
 
+        <!-- Menú de cliente -->
         {% if session.get('usuario_id') and session.get('rol') == 'cliente' %}
           <a class="nav-link {% if active_page == 'entradas' %}active{% endif %}" href="{{ url_for('entradas.vista_entradas') }}">Mis entradas</a>
           <a class="nav-link {% if active_page == 'mis_reservas' %}active{% endif %}" href="{{ url_for('consumos_web.mis_reservas') }}">Mis reservas</a>
           <a class="nav-link {% if active_page == 'perfil' %}active{% endif %}" href="{{ url_for('usuarios_admin.perfil') }}">Mi perfil</a>
         {% endif %}
 
+        <!-- Menú de administrador -->
         {% if session.get('rol') == 'administrador' %}
           <span class="nav-separator"></span>
           <a class="nav-link {% if active_page == 'gestion' %}active{% endif %}" href="{{ url_for('vistas.gestion') }}">Staff / Admin</a>
@@ -42,6 +46,7 @@
         {% endif %}
       </nav>
 
+      <!-- Sesión de usuario -->
       {% if session.get('usuario_id') %}
         <a class="profile-chip" href="{{ url_for('usuarios_admin.perfil') }}" style="text-decoration: none; color: inherit;" title="Ir a mi perfil">
           <span class="avatar">{{ session.get('email', 'U')[0] | upper }}</span>
@@ -63,6 +68,7 @@
       {% endif %}
     </header>
 
+    <!-- Contenido y alertas -->
     <main>
       {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
         {% if categoria == 'exito' %}
@@ -77,6 +83,7 @@
       {% block content %}{% endblock %}
     </main>
 
+    <!-- Pie de página -->
     <footer class="footer">
       <span>© 2026 Cine Paradiso</span>
       <span>TP FINAL GRUPO TESLA</span>
@@ -85,6 +92,7 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
 
+  <!-- Modal de login -->
   {% if not session.get('usuario_id') %}
   <dialog class="modal" id="loginModal">
     <div class="modal-head">
@@ -111,6 +119,7 @@
   </dialog>
   {% endif %}
 
+  <!-- Scripts globales -->
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>

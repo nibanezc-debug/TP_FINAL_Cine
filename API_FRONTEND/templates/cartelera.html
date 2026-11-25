@@ -4,12 +4,14 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/funciones.css') }}" />
 <section class="view active" id="view-cartelera">
+  <!-- Encabezado principal -->
   <div class="hero-copy">
     <span class="eyebrow">BIENVENIDO A CINE PARADISO</span>
     <h1>Elegí tu película y viví la experiencia.</h1>
     <p class="muted">Encontrá tu próxima película y reservá tus butacas en pocos pasos.</p>
   </div>
 
+  <!-- Filtros de cartelera -->
   <form class="filter-panel filter-form" method="get" action="{{ url_for('vistas.cartelera') }}">
     <label class="field">
       <span>CINE</span>
@@ -27,6 +29,7 @@
     <button class="button" type="submit">Filtrar</button>
   </form>
 
+  <!-- Título y cantidad -->
   <div class="section-heading">
     <div>
       <span class="eyebrow">FUNCIONES PRÓXIMAS</span>
@@ -35,6 +38,7 @@
     <span class="muted small">{{ peliculas | length }} películas</span>
   </div>
 
+  <!-- Grilla de películas -->
   <div class="movie-grid">
     {% for p in peliculas %}
     <article class="movie-card">
@@ -48,6 +52,7 @@
         <h3>{{ p.titulo }}</h3>
         <div class="movie-meta">{{ p.clasificacion }} · {{ p.duracion_minutos }} min</div>
         <p class="muted small">{{ p.sinopsis | truncate(100) }}</p>
+        <!-- Próximos horarios -->
         <p>
           {% for f in p.funciones[:3] %}
             <span class="pill">{{ f.fecha_hora[8:10] }}/{{ f.fecha_hora[5:7] }} {{ f.fecha_hora[11:16] }}</span>
