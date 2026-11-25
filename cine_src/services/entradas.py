@@ -105,7 +105,7 @@ def cancelar(id_entrada: int, usuario: dict):
     return _detalle(repositorio.obtener(id_entrada))
 
 def validar(datos):
-    codigo, id_funcion = validar_validacion(datos)
+    codigo = validar_validacion(datos)
     entrada = repositorio.buscar_por_codigo(codigo)
     if entrada is None:
         raise ApiError('El código QR no corresponde a ninguna entrada', 404)
@@ -113,13 +113,17 @@ def validar(datos):
         raise ApiError('La entrada ya fue utilizada', 409)
     if entrada['estado'] == 'cancelada':
         raise ApiError('La entrada fue cancelada', 409)
-    if entrada['id_funcion'] != id_funcion:
-        raise ApiError('La entrada es de otra función', 422)
     if not entrada['es_hoy']:
         raise ApiError('La entrada no corresponde a la fecha de hoy', 422)
     if not repositorio.marcar_usada(entrada['id']):
         raise ApiError('La entrada ya fue utilizada', 409)
-    return {'valida': True, 'id': entrada['id'], 'id_butaca': entrada['id_butaca'], 'estado': 'usada'}
+    return {
+        'valida': True,
+        'id': entrada['id'],
+        'id_funcion': entrada['id_funcion'],
+        'id_butaca': entrada['id_butaca'],
+        'estado': 'usada',
+    }
 
 def estadisticas_cancelaciones(argumentos):
     filas = repositorio.cancelaciones(validar_agrupacion(argumentos), validar_periodo(argumentos))

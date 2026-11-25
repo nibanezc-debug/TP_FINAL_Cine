@@ -31,19 +31,6 @@
         <form id="form-validar-qr" method="POST">
 
             <label class="field">
-                <span>ID DE LA FUNCIÓN</span>
-                <input
-                    type="number"
-                    id="id_funcion"
-                    name="id_funcion"
-                    min="1"
-                    value="{{ id_funcion or '' }}"
-                    placeholder="Ingresá el ID de la función"
-                    required
-                >
-            </label>
-
-            <label class="field">
                 <span>CÓDIGO QR</span>
                 <input
                     type="text"
@@ -71,7 +58,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("form-validar-qr");
     const inputCodigo = document.getElementById("codigo_qr");
-    const inputFuncion = document.getElementById("id_funcion");
     const bloqueCamara = document.getElementById("bloque-camara");
     const estadoCamara = document.getElementById("estado-camara");
 
@@ -80,15 +66,8 @@
     function alEscanear(codigoLeido) {
       html5QrCode.stop().catch(() => {});
       inputCodigo.value = codigoLeido.trim();
-
-      // Solo envía automático si ya pusiste el ID de la función
-      if (inputFuncion.value.trim() !== "") {
-        estadoCamara.textContent = "Código leído. Validando...";
-        form.submit();
-      } else {
-        estadoCamara.textContent = "QR cargado. Ingresá el ID de la función y tocá Validar.";
-        inputFuncion.focus();
-      }
+      estadoCamara.textContent = "Código leído. Validando...";
+      form.submit();
     }
 
     html5QrCode.start(

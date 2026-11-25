@@ -26,14 +26,13 @@ def validar_compra(datos) -> dict:
         raise ApiError('Hay butacas repetidas', 400)
     return {'id_funcion': id_funcion, 'butacas': butacas}
 
-def validar_validacion(datos) -> tuple:
+def validar_validacion(datos) -> str:
     if not isinstance(datos, dict):
         raise ApiError('El cuerpo debe ser un objeto JSON', 400)
     codigo = datos.get('codigo_qr')
     if not isinstance(codigo, str) or not codigo.strip() or len(codigo.strip()) > 64:
         raise ApiError('El código QR es obligatorio', 400)
-    id_funcion = validar_id(datos.get('id_funcion'), 'id_funcion')
-    return codigo.strip(), id_funcion
+    return codigo.strip()
 
 def validar_filtros(argumentos) -> dict:
     filtros = {}
